@@ -1,4 +1,4 @@
-package com.taulukko.commons.util.data;
+package integration.com.taulukko.commons.util.data;
 
 import java.sql.SQLException;
 
