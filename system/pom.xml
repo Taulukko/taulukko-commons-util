@@ -15,7 +15,7 @@
 	<groupId>com.taulukko.commons</groupId>
 	<artifactId>taulukko-commons-util</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.2</version>
 	<!--SNAPSHOT-->	
 
 	<properties>
@@ -104,13 +104,7 @@
 			<artifactId>commons-pool</artifactId>
 			<version>1.6</version>
 		</dependency>
-									
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>fluent-hc</artifactId>
-			<version>4.2.6</version>
-		</dependency>
-						
+										
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
