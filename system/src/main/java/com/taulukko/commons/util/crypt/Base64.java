@@ -85,12 +85,10 @@ package com.taulukko.commons.util.crypt;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public final class Base64
-{
+public final class Base64 {
 
 	// No constructor.
-	private Base64()
-	{
+	private Base64() {
 	}
 
 	// Class methods.
@@ -106,11 +104,10 @@ public final class Base64
 	 * Base64 encode a byte array, returning the returning string.
 	 * 
 	 * @param buf
-	 *            The byte array to encode. 
+	 *            The byte array to encode.
 	 * @return <tt>buf</tt> encoded in Base64.
 	 */
-	public static String encode(byte[] buf)
-	{
+	public static String encode(byte[] buf) {
 		return encode(buf, 0);
 
 	}
@@ -124,8 +121,7 @@ public final class Base64
 	 *            The total length of any line, 0 for unlimited.
 	 * @return <tt>buf</tt> encoded in Base64.
 	 */
-	public static String encode(byte[] buf, int tw)
-	{
+	public static String encode(byte[] buf, int tw) {
 		int srcLength = buf.length;
 		byte[] input = new byte[3];
 		int[] output = new int[4];
@@ -133,8 +129,7 @@ public final class Base64
 		int i = 0;
 		int chars = 0;
 
-		while (srcLength > 2)
-		{
+		while (srcLength > 2) {
 			input[0] = buf[i++];
 			input[1] = buf[i++];
 			input[2] = buf[i++];
@@ -146,32 +141,26 @@ public final class Base64
 			output[3] = input[2] & 0x3f;
 
 			out.append(BASE_64.charAt(output[0]));
-			if (tw > 0 && ++chars % tw == 0)
-			{
+			if (tw > 0 && ++chars % tw == 0) {
 				out.append("\n");
 			}
 			out.append(BASE_64.charAt(output[1]));
-			if (tw > 0 && ++chars % tw == 0)
-			{
+			if (tw > 0 && ++chars % tw == 0) {
 				out.append("\n");
 			}
 			out.append(BASE_64.charAt(output[2]));
-			if (tw > 0 && ++chars % tw == 0)
-			{
+			if (tw > 0 && ++chars % tw == 0) {
 				out.append("\n");
 			}
 			out.append(BASE_64.charAt(output[3]));
-			if (tw > 0 && ++chars % tw == 0)
-			{
+			if (tw > 0 && ++chars % tw == 0) {
 				out.append("\n");
 			}
 		}
 
-		if (srcLength != 0)
-		{
+		if (srcLength != 0) {
 			input[0] = input[1] = input[2] = 0;
-			for (int j = 0; j < srcLength; j++)
-			{
+			for (int j = 0; j < srcLength; j++) {
 				input[j] = buf[i + j];
 			}
 			output[0] = (input[0] & 0xff) >>> 2;
@@ -179,35 +168,27 @@ public final class Base64
 			output[2] = ((input[1] & 0x0f) << 2) + ((input[2] & 0xff) >>> 6);
 
 			out.append(BASE_64.charAt(output[0]));
-			if (tw > 0 && ++chars % tw == 0)
-			{
+			if (tw > 0 && ++chars % tw == 0) {
 				out.append("\n");
 			}
 			out.append(BASE_64.charAt(output[1]));
-			if (tw > 0 && ++chars % tw == 0)
-			{
+			if (tw > 0 && ++chars % tw == 0) {
 				out.append("\n");
 			}
-			if (srcLength == 1)
-			{
+			if (srcLength == 1) {
 				out.append(BASE_64_PAD);
-			}
-			else
-			{
+			} else {
 				out.append(BASE_64.charAt(output[2]));
 			}
-			if (tw > 0 && ++chars % tw == 0)
-			{
+			if (tw > 0 && ++chars % tw == 0) {
 				out.append("\n");
 			}
 			out.append(BASE_64_PAD);
-			if (tw > 0 && ++chars % tw == 0)
-			{
+			if (tw > 0 && ++chars % tw == 0) {
 				out.append("\n");
 			}
 		}
-		if (tw > 0)
-		{
+		if (tw > 0) {
 			out.append("\n");
 		}
 
@@ -223,102 +204,107 @@ public final class Base64
 	 * @throws java.io.IOException
 	 *             If the argument is not a valid Base-64 encoding.
 	 */
-	public static byte[] decode(String b64) throws IOException
-	{
+	public static byte[] decode(String b64) throws IOException {
+		return decode(b64, false);
+	}
+
+	/**
+	 * Decode a Base-64 string into a byte array.
+	 * 
+	 * @param b64
+	 *            The Base-64 encoded string.
+	 * @param ignoreTerminator
+	 *            No exception to miss = in the end
+	 * @return The decoded bytes.
+	 * @throws java.io.IOException
+	 *             If the argument is not a valid Base-64 encoding.
+	 */
+	public static byte[] decode(String b64, boolean ignoreTerminator)
+			throws IOException {
+		if (ignoreTerminator) {
+			if (!b64.endsWith(new String(new char[BASE_64_PAD]))) {
+				b64 = b64 + BASE_64_PAD;
+			}
+		}
 		ByteArrayOutputStream result = new ByteArrayOutputStream(
 				b64.length() / 3);
 		int state = 0, i;
 		byte temp = 0;
 
-		for (i = 0; i < b64.length(); i++)
-		{
-			if (Character.isWhitespace(b64.charAt(i)))
-			{
+		for (i = 0; i < b64.length(); i++) {
+			if (Character.isWhitespace(b64.charAt(i))) {
 				continue;
 			}
-			if (b64.charAt(i) == BASE_64_PAD)
-			{
+			if (b64.charAt(i) == BASE_64_PAD) {
 				break;
 			}
 
 			int pos = BASE_64.indexOf(b64.charAt(i));
-			if (pos < 0)
-			{
+			if (pos < 0) {
 				throw new IOException("non-Base64 character " + b64.charAt(i));
 			}
-			switch (state)
-			{
-				case 0:
-					temp = (byte) (pos - BASE_64.indexOf('A') << 2);
-					state = 1;
-					break;
+			switch (state) {
+			case 0:
+				temp = (byte) (pos - BASE_64.indexOf('A') << 2);
+				state = 1;
+				break;
 
-				case 1:
-					temp |= (byte) (pos - BASE_64.indexOf('A') >>> 4);
-					result.write(temp);
-					temp = (byte) ((pos - BASE_64.indexOf('A') & 0x0f) << 4);
-					state = 2;
-					break;
+			case 1:
+				temp |= (byte) (pos - BASE_64.indexOf('A') >>> 4);
+				result.write(temp);
+				temp = (byte) ((pos - BASE_64.indexOf('A') & 0x0f) << 4);
+				state = 2;
+				break;
 
-				case 2:
-					temp |= (byte) ((pos - BASE_64.indexOf('A') & 0x7f) >>> 2);
-					result.write(temp);
-					temp = (byte) ((pos - BASE_64.indexOf('A') & 0x03) << 6);
-					state = 3;
-					break;
+			case 2:
+				temp |= (byte) ((pos - BASE_64.indexOf('A') & 0x7f) >>> 2);
+				result.write(temp);
+				temp = (byte) ((pos - BASE_64.indexOf('A') & 0x03) << 6);
+				state = 3;
+				break;
 
-				case 3:
-					temp |= (byte) (pos - BASE_64.indexOf('A') & 0xff);
-					result.write(temp);
-					state = 0;
-					break;
+			case 3:
+				temp |= (byte) (pos - BASE_64.indexOf('A') & 0xff);
+				result.write(temp);
+				state = 0;
+				break;
 
-				default:
-					throw new Error("this statement should be unreachable");
+			default:
+				throw new Error("this statement should be unreachable");
 			}
 		}
 
-		if (i < b64.length() && b64.charAt(i) == BASE_64_PAD)
-		{
-			switch (state)
-			{
-				case 0:
-				case 1:
-					throw new IOException("malformed Base64 sequence");
+		if (i < b64.length() && b64.charAt(i) == BASE_64_PAD) {
+			switch (state) {
+			case 0:
+			case 1:
+				throw new IOException("malformed Base64 sequence");
 
-				case 2:
-					for (; i < b64.length(); i++)
-					{
-						if (!Character.isWhitespace(b64.charAt(i)))
-						{
-							break;
-						}
+			case 2:
+				for (; i < b64.length(); i++) {
+					if (!Character.isWhitespace(b64.charAt(i))) {
+						break;
 					}
-					// We must see a second pad character here.
-					if (b64.charAt(i) != BASE_64_PAD)
-					{
+				}
+				// We must see a second pad character here.
+				if (b64.charAt(i) != BASE_64_PAD) {
+					throw new IOException("malformed Base64 sequence");
+				}
+				i++;
+				// Fall-through.
+
+			case 3:
+				i++;
+				for (; i < b64.length(); i++) {
+					// We should only see whitespace after this.
+					if (!Character.isWhitespace(b64.charAt(i))) {
+						System.err.println(b64.charAt(i));
 						throw new IOException("malformed Base64 sequence");
 					}
-					i++;
-					// Fall-through.
-
-				case 3:
-					i++;
-					for (; i < b64.length(); i++)
-					{
-						// We should only see whitespace after this.
-						if (!Character.isWhitespace(b64.charAt(i)))
-						{
-							System.err.println(b64.charAt(i));
-							throw new IOException("malformed Base64 sequence");
-						}
-					}
+				}
 			}
-		}
-		else
-		{
-			if (state != 0)
-			{
+		} else {
+			if (state != 0) {
 				throw new IOException("malformed Base64 sequence");
 			}
 		}
