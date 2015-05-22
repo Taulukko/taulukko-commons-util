@@ -142,9 +142,13 @@ public abstract class ConfigBase {
 
 	private static String realPath;
 
-	public ConfigBase(Reloadable reloadable) {
+	private static boolean j2ee = false;
+
+	public ConfigBase(Reloadable reloadable, boolean j2ee) {
 		ConfigBase.reloadable = reloadable;
-		instance = this;
+		ConfigBase.j2ee = j2ee;
+		ConfigBase.instance = this;
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -158,11 +162,15 @@ public abstract class ConfigBase {
 		ConfigBase.projectName = projectName;
 		ConfigBase.realPath = realPath;
 		try {
-			ConfigBase.startByURI(new URI("file:///"
-					+ realPath
-					+ String.format("WEB-INF/classes/config/%s.properties",
-							projectName)));
-
+			if (j2ee) {
+				ConfigBase.startByURI(new URI("file:///"
+						+ realPath
+						+ String.format("WEB-INF/classes/config/%s.properties",
+								projectName)));
+			} else {
+				ConfigBase.startByURI(new URI("file:///" + realPath
+						+ String.format("config/%s.properties", projectName)));
+			}
 			reloadProperties();
 
 		} catch (Exception e) {
@@ -257,9 +265,14 @@ public abstract class ConfigBase {
 		if (!file.exists()) {
 
 			if (tryAgain) {
-				startByURI(new URI("file:///" + realPath.replace('\\', '/')
-						+ "/WEB-INF/classes/config/" + projectName + ".properties"),
-						false);
+				if (j2ee) {
+					startByURI(new URI("file:///" + realPath.replace('\\', '/')
+							+ "/WEB-INF/classes/config/" + projectName
+							+ ".properties"), false);
+				} else {
+					startByURI(new URI("file:///" + realPath.replace('\\', '/')
+							+ "/config/" + projectName + ".properties"), false);
+				}
 				return;
 			} else {
 				throw new Exception(uri.toString() + " not found");
