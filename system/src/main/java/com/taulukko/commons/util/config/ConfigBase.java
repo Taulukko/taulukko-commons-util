@@ -165,7 +165,7 @@ public abstract class ConfigBase {
 			if (j2ee) {
 				ConfigBase.startByURI(new URI("file:///"
 						+ realPath
-						+ String.format("WEB-INF/classes/config/%s.properties",
+						+ String.format("config/%s.properties",
 								projectName)));
 			} else {
 				ConfigBase.startByURI(new URI("file:///" + realPath
