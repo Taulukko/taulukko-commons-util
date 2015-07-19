@@ -6,7 +6,9 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.taulukko.commons.util.io.EFile;
@@ -15,7 +17,7 @@ import com.taulukko.commons.util.lang.EDate;
 
 public abstract class ConfigBase {
 
-	private static ConfigBase instance = null;
+	private static Map<Class<? extends ConfigBase>, ConfigBase> instances = new ConcurrentHashMap<>();
 
 	// //////////////////
 	// SERVER//
@@ -48,9 +50,6 @@ public abstract class ConfigBase {
 
 	// ID do cluster do servidor
 	public String clusterId = "01";
-
-	// taulukkoApiUrl
-	public String taulukkoApiUrl = "http://localhost:8081/version/1.0/";
 
 	// ////////
 	// LOG//
@@ -136,70 +135,84 @@ public abstract class ConfigBase {
 
 	private Thread thread = null;
 
-	private static Reloadable reloadable = null;
+	private Reloadable reloadable = null;
 
-	private static String projectName;
+	protected String projectName;
 
-	private static String realPath;
+	protected String realPath;
 
-	private static boolean j2ee = false;
+	protected boolean j2ee = false;
 
-	public ConfigBase(Reloadable reloadable, boolean j2ee) {
-		ConfigBase.reloadable = reloadable;
-		ConfigBase.j2ee = j2ee;
-		ConfigBase.instance = this;
-
+	public <T extends ConfigBase> ConfigBase(Reloadable reloadable,
+			boolean j2ee, Class<T> clazz) {
+		this.reloadable = reloadable;
+		this.j2ee = j2ee;
+		ConfigBase.instances.put(clazz, this);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends ConfigBase> T getInstance() {
-		return (T) instance;
+	public static <T extends ConfigBase> T getInstance(Class<T> clazz) {
+		return (T) instances.get(clazz);
 	}
 
-	public static void startDefault(ConfigBase configBase, String projectName,
-			String realPath) {
-		ConfigBase.instance = configBase;
-		ConfigBase.projectName = projectName;
-		ConfigBase.realPath = realPath;
-		try {
-			if (j2ee) {
-				ConfigBase.startByURI(new URI("file:///"
-						+ realPath
-						+ String.format("config/%s.properties",
-								projectName)));
-			} else {
-				ConfigBase.startByURI(new URI("file:///" + realPath
-						+ String.format("config/%s.properties", projectName)));
-			}
-			reloadProperties();
+	public static <T extends ConfigBase> void startDefault(Class<T> clazz,
+			ConfigBuilder<T> builder, String projectName, String realPath)
+			throws Exception {
 
+		T config = builder.createNewConfig();
+		if (!realPath.endsWith("/") || !realPath.endsWith("\\")) {
+			realPath += "/";
+		}
+
+		ConfigBase.instances.put(clazz, config);
+		config.projectName = projectName;
+		config.realPath = realPath;
+
+		if (config.j2ee) {
+			ConfigBase.startByURI(
+					clazz,
+					new URI(
+							"file:///"
+									+ realPath
+									+ String.format("config/%s.properties",
+											projectName)));
+		} else {
+			ConfigBase.startByURI(
+					clazz,
+					new URI(
+							"file:///"
+									+ realPath
+									+ String.format("config/%s.properties",
+											projectName)));
+		}
+		ConfigBase.<T> reloadProperties(clazz);
+
+	}
+
+	public void stopDefault() {
+		try {
+			this.live = false;
+			this.thread.join();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void stopDefault() {
-		try {
-			getInstance().live = false;
-			getInstance().thread.join();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static void reloadProperties() {
-		getInstance().thread = new Thread(new Runnable() {
+	protected static <T extends ConfigBase> void reloadProperties(
+			final Class<T> clazz) {
+		final ConfigBase config = getInstance(clazz);
+		config.thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 
-				while (getInstance().live) {
+				while (config.live) {
 					try {
 						Thread.sleep(5000);
 
-						if (getInstance().lastURI == null) {
+						if (config.lastURI == null) {
 							continue;
 						}
-						File properties = new File(getInstance().lastURI);
+						File properties = new File(config.lastURI);
 
 						EFileBufferReader reader = new EFileBufferReader(
 								properties.getAbsolutePath());
@@ -207,29 +220,25 @@ public abstract class ConfigBase {
 						int size = content.length();
 						reader.close();
 
-						if (!properties.exists()
-								|| getInstance().lastSize == size) {
+						if (!properties.exists() || config.lastSize == size) {
 							continue;
 						}
 
-						getInstance().lastSize = size;
+						config.lastSize = size;
 
-						info("Reloading config [" + ConfigBase.projectName
-								+ "]...");
+						info("Reloading config [" + config.projectName + "]...");
 
-						for (ConfigObserver observer : getInstance().reloadObservers) {
+						for (ConfigObserver observer : config.reloadObservers) {
 							observer.before();
 						}
 
-						synchronized (getInstance().lastURI) {
-							startByURI(getInstance().lastURI);
+						synchronized (config.lastURI) {
+							ConfigBase.<T> startByURI(clazz, config.lastURI);
 						}
 
-						for (ConfigObserver observer : getInstance().reloadObservers) {
+						for (ConfigObserver observer : config.reloadObservers) {
 							observer.after();
 						}
-
-						info("Config [" + ConfigBase.projectName + "] reloaded");
 
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -243,8 +252,8 @@ public abstract class ConfigBase {
 				}
 			}
 		}, "Config Service");
-		getInstance().thread.setPriority(Thread.MIN_PRIORITY);
-		getInstance().thread.start();
+		config.thread.setPriority(Thread.MIN_PRIORITY);
+		config.thread.start();
 	}
 
 	private static void info(String value
@@ -253,25 +262,32 @@ public abstract class ConfigBase {
 		System.out.println(value);
 	}
 
-	static void startByURI(URI uri) throws Exception {
-		startByURI(uri, true);
+	static <T extends ConfigBase> void startByURI(Class<T> clazz, URI uri)
+			throws Exception {
+		ConfigBase config = getInstance(clazz);
+		config.startByURI(uri, true);
 	}
 
-	private static void startByURI(URI uri, boolean tryAgain) throws Exception {
+	private void startByURI(URI uri, boolean tryAgain) throws Exception {
 
-		getInstance().lastURI = uri;
+		this.lastURI = uri;
 		File file = new File(uri);
 
 		if (!file.exists()) {
 
 			if (tryAgain) {
-				if (j2ee) {
-					startByURI(new URI("file:///" + realPath.replace('\\', '/')
-							+ "/WEB-INF/classes/config/" + projectName
-							+ ".properties"), false);
+				if (this.j2ee) {
+					this.startByURI(
+							new URI("file:///"
+									+ this.realPath.replace('\\', '/')
+									+ "/WEB-INF/classes/config/"
+									+ this.projectName + ".properties"), false);
 				} else {
-					startByURI(new URI("file:///" + realPath.replace('\\', '/')
-							+ "/config/" + projectName + ".properties"), false);
+					this.startByURI(
+							new URI("file:///"
+									+ this.realPath.replace('\\', '/')
+									+ "/config/" + this.projectName
+									+ ".properties"), false);
 				}
 				return;
 			} else {
@@ -287,132 +303,128 @@ public abstract class ConfigBase {
 
 		String property = properties.getProperty("accessLevel", null);
 		if (property != null) {
-			getInstance().accessLevel = String.valueOf(property);
+			this.accessLevel = String.valueOf(property);
 		}
 
 		property = properties.getProperty("clusterId", null);
 		if (property != null) {
-			getInstance().clusterId = property;
+			this.clusterId = property;
 		}
 
 		property = properties.getProperty("emailSleepTime", null);
 		if (property != null) {
-			getInstance().emailSleepTime = Integer.valueOf(property);
+			this.emailSleepTime = Integer.valueOf(property);
 		}
 
 		property = properties.getProperty("accessPath", null);
 		if (property != null) {
-			getInstance().accessPath = String.valueOf(property);
+			this.accessPath = String.valueOf(property);
 		}
 
 		property = properties.getProperty("accessPattern", null);
 		if (property != null) {
-			getInstance().accessPattern = String.valueOf(property);
+			this.accessPattern = String.valueOf(property);
 		}
 
 		property = properties.getProperty("rootLevel", null);
 		if (property != null) {
-			getInstance().rootLevel = String.valueOf(property);
+			this.rootLevel = String.valueOf(property);
 		}
 
 		property = properties.getProperty("rootPath", null);
 		if (property != null) {
-			getInstance().rootPath = String.valueOf(property);
+			this.rootPath = String.valueOf(property);
 		}
 
 		property = properties.getProperty("rootPattern", null);
 		if (property != null) {
-			getInstance().rootPattern = String.valueOf(property);
+			this.rootPattern = String.valueOf(property);
 		}
 
 		property = properties.getProperty("serverCreated", null);
 		if (property != null) {
-			getInstance().serverCreated = String.valueOf(property);
+			this.serverCreated = String.valueOf(property);
 		}
 
 		property = properties.getProperty("serverDebug", null);
 		if (property != null) {
-			getInstance().serverDebug = Boolean.valueOf(property);
+			this.serverDebug = Boolean.valueOf(property);
 		}
 
 		property = properties.getProperty("serverVersion", null);
 		if (property != null) {
-			getInstance().serverVersion = String.valueOf(property);
+			this.serverVersion = String.valueOf(property);
 		}
 
 		property = properties.getProperty("stdOutLevel", null);
 		if (property != null) {
-			getInstance().stdOutLevel = String.valueOf(property);
+			this.stdOutLevel = String.valueOf(property);
 		}
 
 		property = properties.getProperty("stdOutPattern", null);
 		if (property != null) {
-			getInstance().stdOutPattern = String.valueOf(property);
+			this.stdOutPattern = String.valueOf(property);
 		}
 
 		property = properties.getProperty("stdOutPath", null);
 		if (property != null) {
-			getInstance().stdOutPath = String.valueOf(property);
+			this.stdOutPath = String.valueOf(property);
 		}
 
 		property = properties.getProperty("sqlLevel", null);
 		if (property != null) {
-			getInstance().sqlLevel = String.valueOf(property);
+			this.sqlLevel = String.valueOf(property);
 		}
 
 		property = properties.getProperty("sqlPattern", null);
 		if (property != null) {
-			getInstance().sqlPattern = String.valueOf(property);
+			this.sqlPattern = String.valueOf(property);
 		}
 
 		property = properties.getProperty("sqlPath", null);
 		if (property != null) {
-			getInstance().sqlPath = String.valueOf(property);
+			this.sqlPath = String.valueOf(property);
 		}
 
 		property = properties.getProperty("emailSendEnabled", null);
 		if (property != null) {
-			getInstance().emailSendEnabled = Boolean.valueOf(property);
+			this.emailSendEnabled = Boolean.valueOf(property);
 		}
 
 		property = properties.getProperty("browserShowJSErrors", null);
 		if (property != null) {
-			getInstance().browserShowJSErrors = Boolean.valueOf(property);
+			this.browserShowJSErrors = Boolean.valueOf(property);
 		}
 
 		property = properties.getProperty("email", null);
 		if (property != null) {
-			getInstance().email = property;
+			this.email = property;
 		}
 
 		property = properties.getProperty("emailPassword", null);
 		if (property != null) {
-			getInstance().emailPassword = property;
+			this.emailPassword = property;
 		}
 
 		property = properties.getProperty("emailSmtp", null);
 		if (property != null) {
-			getInstance().emailSmtp = property;
+			this.emailSmtp = property;
 		}
 
 		property = properties.getProperty("emailMaxFIFO", null);
 		if (property != null) {
-			getInstance().emailMaxFIFO = Integer.parseInt(property);
+			this.emailMaxFIFO = Integer.parseInt(property);
 		}
 
-		property = properties.getProperty("taulukkoApiUrl", null);
-		if (property != null) {
-			getInstance().taulukkoApiUrl = property;
-		}
-
-		if (reloadable != null) {
-			reloadable.reload(getInstance(), properties);
+		if (this.reloadable != null) {
+			this.reloadable.reload(this, properties);
 		}
 
 	}
 
-	public static void save(String propertie, String value) throws Exception {
-		File file = new File(getInstance().lastURI);
+	public void save(String propertie, String value) throws Exception {
+
+		File file = new File(this.lastURI);
 		if (!file.exists()) {
 			throw new Exception("File not exist");
 		}
@@ -431,22 +443,23 @@ public abstract class ConfigBase {
 
 	}
 
-	public static void addObserver(String type, ConfigObserver observer) {
+	public void addObserver(String type, ConfigObserver observer) {
+
 		if (observer != null && type.toLowerCase().equals("reload")) {
-			getInstance().reloadObservers.add(observer);
+			this.reloadObservers.add(observer);
 		}
 	}
 
-	public static boolean removeObserver(String type, ConfigObserver observer) {
+	public boolean removeObserver(String type, ConfigObserver observer) {
 		if (observer != null && type.toLowerCase().equals("reload")) {
-			return getInstance().reloadObservers.remove(observer);
+			return this.reloadObservers.remove(observer);
 		}
 		return false;
 	}
 
-	public static void clearObserver(String type) {
+	public void clearObserver(String type) {
 		if (type.toLowerCase().equals("reload")) {
-			getInstance().reloadObservers.clear();
+			this.reloadObservers.clear();
 		}
 	}
 
