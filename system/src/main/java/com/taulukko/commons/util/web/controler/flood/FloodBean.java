@@ -8,11 +8,11 @@ public class FloodBean
 
 	private Map<String, Integer> logins = new ConcurrentHashMap<String, Integer>();
 
-	private String _address = null;
+	private String address = null;
 
-	private long _lastTry = System.currentTimeMillis();
+	private long lastTry = System.currentTimeMillis();
 
-	private long _banTime = 0;
+	private long banTime = 0;
 
 	public int getCountByLogin(String login)
 	{
@@ -22,33 +22,33 @@ public class FloodBean
 
 	public void setCountByLogin(String login, int count)
 	{
-		_lastTry = System.currentTimeMillis();
+		lastTry = System.currentTimeMillis();
 		logins.put(login, count);
 	}
 
 	public String getAddress()
 	{
-		return _address;
+		return address;
 	}
 
 	public void setAddress(String address)
 	{
-		_address = address;
+		this.address = address;
 	}
 
 	public long getBanTime()
 	{
-		return _banTime;
+		return banTime;
 	}
 
 	public void setBanTime(long banTime)
 	{
-		_banTime = banTime;
+		this.banTime = banTime;
 	}
 
 	public long getLastTry()
 	{
-		return _lastTry;
+		return lastTry;
 	}
 
 	// retorna sempre atualizado

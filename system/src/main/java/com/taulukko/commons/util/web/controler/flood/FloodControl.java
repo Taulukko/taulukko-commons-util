@@ -11,7 +11,7 @@ public class FloodControl
 
 	private static FloodControl _me = null;
 
-	private Map<String, FloodBean> _floodInformation = new ConcurrentHashMap<String, FloodBean>();
+	private Map<String, FloodBean> floodInformation = new ConcurrentHashMap<String, FloodBean>();
 
 	private long _lastForgot = System.currentTimeMillis();
 
@@ -40,21 +40,28 @@ public class FloodControl
 		}
 		return _me;
 	}
-
-	public void forgot()
+	
+	public void start()
 	{
 		if ((_lastForgot + IFloodConstants.TP_FORGOT_TIME) < System
 				.currentTimeMillis())
 		{
 			// hora de esquecer
-			_floodInformation = new HashMap<String, FloodBean>();
+			floodInformation = new HashMap<String, FloodBean>();
 			_lastForgot = System.currentTimeMillis();
 		}
 	}
 
+	@Deprecated 
+	/**Use start*/
+	public void forgot()
+	{
+		this.start();
+	}
+
 	public int getTotalFlood(String remoteAddress)
 	{
-		FloodBean floodBean = _floodInformation.get(remoteAddress);
+		FloodBean floodBean = floodInformation.get(remoteAddress);
 		return (null == floodBean) ? 0 : floodBean.getTotalFlood();
 	}
 
@@ -71,9 +78,9 @@ public class FloodControl
 
 	public void clearSuccess(String remoteAddress, String login)
 	{
-		if (_floodInformation.containsKey(remoteAddress))
+		if (floodInformation.containsKey(remoteAddress))
 		{
-			FloodBean floodBean = _floodInformation.get(remoteAddress);
+			FloodBean floodBean = floodInformation.get(remoteAddress);
 
 			if (floodBean.getCountByLogin(login) > 0)
 			{
@@ -102,7 +109,7 @@ public class FloodControl
 
 	public boolean isBanned(String remoteAddress)
 	{
-		FloodBean floodBean = _floodInformation.get(remoteAddress);
+		FloodBean floodBean = floodInformation.get(remoteAddress);
 		return floodBean != null
 				&& (floodBean.getBanTime() + floodBean.getLastTry()) > System
 						.currentTimeMillis();
@@ -110,7 +117,7 @@ public class FloodControl
 
 	public long remaningTime(String remoteAddress)
 	{
-		FloodBean floodBean = _floodInformation.get(remoteAddress);
+		FloodBean floodBean = floodInformation.get(remoteAddress);
 		if (null == floodBean)
 		{
 			return 0;
@@ -126,7 +133,7 @@ public class FloodControl
 			stdout.debug("Address parameter in addSuspect:" + remoteAddress);
 			stdout.debug("login parameter in addSuspect:" + login);
 		}
-		FloodBean logins = _floodInformation.get(remoteAddress);
+		FloodBean logins = floodInformation.get(remoteAddress);
 		if (logins != null)
 		{
 
@@ -164,7 +171,7 @@ public class FloodControl
 		{
 			stdout.debug("Ban Time:" + logins.getBanTime());
 		}
-		_floodInformation.put(remoteAddress, logins);
+		floodInformation.put(remoteAddress, logins);
 		if(stdout.isDebugEnabled())
 		{
 			stdout.debug("depois total:" + logins.getTotalFlood());

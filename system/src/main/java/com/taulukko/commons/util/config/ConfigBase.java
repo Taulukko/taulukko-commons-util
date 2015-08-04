@@ -208,6 +208,9 @@ public abstract class ConfigBase {
 				while (config.live) {
 					try {
 						Thread.sleep(5000);
+						if (!config.live) {
+							return;
+						}
 
 						if (config.lastURI == null) {
 							continue;
