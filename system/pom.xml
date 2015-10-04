@@ -15,7 +15,7 @@
 	<groupId>com.taulukko.commons</groupId>
 	<artifactId>taulukko-commons-util</artifactId>
 	<packaging>jar</packaging>
-	<version>1.1.10-SNAPSHOT</version>
+	<version>1.1.12-0-0-SNAPSHOT</version>
 	<!--SNAPSHOT-->	
 
 	<properties>
@@ -23,6 +23,7 @@
 		<junit.version>4.11</junit.version>
 		<jdk.version>1.7</jdk.version>
 		<servlet.version>2.5</servlet.version>
+		<encoding>UTF-8</encoding>
 	</properties>
 
   
@@ -133,7 +134,7 @@
 	</dependencies>
 
 	<build>
-
+	 
 		
 		<plugins>
 			<plugin>
@@ -141,9 +142,11 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.0</version>
 				<configuration>
+					<argLine>-Dfile.encoding=${encoding}</argLine>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>
 				</configuration>
+				
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -155,14 +158,23 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.18.1</version>
 				<configuration>
+					<argLine>-Dfile.encoding=${encoding}</argLine>
 					<excludes>
 						<exclude>integration/**/*Test.java</exclude>						
 					</excludes>
 					<includes>
 						<include>**/taulukko/**/*Test.java</include>
 					</includes>
+					
 				</configuration>
 			</plugin>
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <encoding>${encoding}</encoding>
+                </configuration>
+            </plugin>
 		</plugins>
 
 	</build>

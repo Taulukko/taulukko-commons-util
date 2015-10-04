@@ -306,5 +306,7 @@ public class EFile extends EAbstractFile {
 		return partName[partName.length - 1];
 
 	}
+	
+	 
 
 }

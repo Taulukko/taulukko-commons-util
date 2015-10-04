@@ -13,34 +13,39 @@ import javax.crypto.Cipher;
 
 import com.taulukko.commons.util.lang.EString;
 
-@Deprecated
-/**
- * Use Password Gen
- * */
-public class PasswordTool
-{
+public class PasswordGen {
+	
+	public static final String VERSION_2_0_0 = "0200";
+	public static final String VERSION_1_0_0 = "0100";
+	
 	private static final String SHA = "SHA";
 
 	private static final String MD5 = "MD5";
 
-	public static void main(String argsv[])
-	{
+	private String salt = "FLUX CAPACITOR";
+
+	private String version;
+
+	public static void main(String argsv[]) {
+
+		PasswordGen genpass2 = new PasswordGen(VERSION_2_0_0,"FLUX CAPACITOR");
+		PasswordGen genpass = new PasswordGen("0100","FLUX CAPACITOR");
+
 		System.out.println("Senha default(aoors$dqjq55q)"
-				+ PasswordTool.crypt("aoors$dqjq55q"));
+				+ genpass2.subCrypt("aoors$dqjq55q"));
 		System.out.println("Senha MD5(aoors$dqjq55q)"
-				+ PasswordTool.cryptMD5("aoors$dqjq55q"));
+				+ genpass2.cryptMD5("aoors$dqjq55q"));
 		System.out.println("Senha SHA(aoors$dqjq55q)"
-				+ PasswordTool.cryptSHA("aoors$dqjq55q"));
+				+ genpass2.cryptSHA("aoors$dqjq55q"));
 
 		System.out.println("Senha crypt(aoors$dqjq55q)"
-				+ PasswordTool.crypt("aoors$dqjq55q"));
+				+ genpass2.subCrypt("aoors$dqjq55q"));
 
-		try
-		{
+		try {
 			System.out.println("Senha crypt(aoors$dqjq55q,0100)"
-					+ PasswordTool.crypt("aoors$dqjq55q", "0100"));
+					+ genpass.crypt("aoors$dqjq55q"));
 			System.out.println("Senha crypt(aoors$dqjq55q,0200)"
-					+ PasswordTool.crypt("aoors$dqjq55q", "0200"));
+					+ genpass2.crypt("aoors$dqjq55q"));
 
 			// boiada
 			String encrypted = "4a4a7a6a54596f6b71324e634a776e76744446646e6b5174706453696679596f4177362f63624158356f616c596d574c6c65345341676d4230647568507947445979324565613030765767343453783841537977514348434d5375362b6d677461566b514f6e674a624638344c7530527147323169497730427645595679614530527a5a64714672787454503932324a426d334b756d536b477350547a72457137694b6f2f4432613935303d";
@@ -48,20 +53,26 @@ public class PasswordTool
 
 			System.out
 					.println("Senha decript(hexbase64cryptedPassword,privateKey64)"
-							+ PasswordTool.decryptHexFromRSA(encrypted,
-									privateKey64));
-		}
-		catch (Exception e)
-		{
+							+ genpass2
+									.decryptHexFromRSA(encrypted, privateKey64));
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
 
-	public static String decryptHexFromRSA(String passwordEncryptedHex64,
-			String privateKey64) throws Exception
-	{
+	public PasswordGen() {
+		this(VERSION_2_0_0, "FLUX CAPACITOR");
+	}
+
+	public PasswordGen(String version, String salt) {
+		this.version = version;
+		this.salt = salt;
+	}
+
+	public String decryptHexFromRSA(String passwordEncryptedHex64,
+			String privateKey64) throws Exception {
 		PrivateKey privateKey = convertToPrivateKey(privateKey64);
 
 		String passwordEncrypted64 = hexToString(passwordEncryptedHex64);
@@ -78,8 +89,7 @@ public class PasswordTool
 		return password;
 	}
 
-	public static EKeyPair createKeys() throws NoSuchAlgorithmException
-	{
+	public EKeyPair createKeys() throws NoSuchAlgorithmException {
 		KeyPairGenerator geradorDeChave = KeyPairGenerator.getInstance("RSA");
 		geradorDeChave.initialize(1024);
 
@@ -97,9 +107,7 @@ public class PasswordTool
 		return ekeypar;
 	}
 
-	private static PrivateKey convertToPrivateKey(String base64Key)
-			throws Exception
-	{
+	private PrivateKey convertToPrivateKey(String base64Key) throws Exception {
 		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(
 				Base64.decode(base64Key));
 		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -107,12 +115,10 @@ public class PasswordTool
 		return privateKey;
 	}
 
-	public static String hexToString(String hex)
-	{
+	public String hexToString(String hex) {
 		StringBuilder sb = new StringBuilder();
 
-		for (int i = 0; i < hex.length() - 1; i += 2)
-		{
+		for (int i = 0; i < hex.length() - 1; i += 2) {
 			String output = hex.substring(i, (i + 2)); // grab the hex in pairs
 			int decimal = Integer.parseInt(output, 16); // convert hex to
 														// decimal
@@ -122,29 +128,19 @@ public class PasswordTool
 		return sb.toString();
 	}
 
-	public static String crypt(String text, String version) throws Exception
-	{
-		if (version.equals("0100"))
-		{
-			return crypt(text);
-		}
-		else if (version.equals("0200"))
-		{
-			String salt = "FLUX CAPACITOR";
-
-			return "0200==" + crypt(text + salt);
-		}
-		else
-		{
+	public String crypt(String text) throws Exception {
+		if (version.equals(VERSION_1_0_0)) {
+			return subCrypt(text);
+		} else if (version.equals(VERSION_2_0_0)) {
+			return VERSION_2_0_0 + "==" + subCrypt(text + salt);
+		} else {
 			throw new Exception("Encrypt version not suported");
 		}
 
 	}
 
-	public static String crypt(String sPassword)
-	{
-		try
-		{
+	private String subCrypt(String sPassword) {
+		try {
 
 			// cria a conta no l2-login
 			MessageDigest md = MessageDigest.getInstance(MD5);
@@ -153,19 +149,15 @@ public class PasswordTool
 			// sPassword = EString.toHexString(hash).toString();
 			sPassword = Base64.encode(hash, 0);
 			return sPassword;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 
 	}
 
-	private static String cryptBase(String sPassword, String sMethod)
-	{
-		try
-		{
+	private String cryptBase(String sPassword, String sMethod) {
+		try {
 
 			// cria a conta no l2-login
 			MessageDigest md = MessageDigest.getInstance(sMethod);
@@ -174,40 +166,32 @@ public class PasswordTool
 			// sPassword = EString.toHexString(hash).toString();
 			sPassword = Base64.encode(hash, 0);
 			return sPassword;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			return null;
 		}
 
 	}
 
-	public static String cryptMD5(String sPassword)
-	{
-		return PasswordTool.cryptBase(sPassword, MD5);
+	public String cryptMD5(String sPassword) {
+		return cryptBase(sPassword, MD5);
 
 	}
 
-	public static String cryptSHA(String sPassword)
-	{
-		return PasswordTool.cryptBase(sPassword, SHA);
+	public String cryptSHA(String sPassword) {
+		return cryptBase(sPassword, SHA);
 
 	}
 
-	public static String clearPass(String pass)
-	{
-		if (pass.startsWith("0200=="))
-		{
+	public String clearPass(String pass) {
+		if (pass.startsWith(VERSION_2_0_0 + "==")) {
 			String salt = "FLUX CAPACITOR";
-			return clearPass(crypt(pass + salt));
+			return clearPass(subCrypt(pass + salt));
 		}
 
 		EString empty = new EString("");
 		String valid = "abcdefghijklmnopqrstuvxzwyABCDEFGHIJKLMNOPQRSTUVXYZW0123456789";
-		for (int cont = 0; cont < pass.length(); cont++)
-		{
-			if (valid.indexOf(String.valueOf(pass.charAt(cont))) < 0)
-			{
+		for (int cont = 0; cont < pass.length(); cont++) {
+			if (valid.indexOf(String.valueOf(pass.charAt(cont))) < 0) {
 				pass = new EString(pass).replace(
 						new EString(String.valueOf(pass.charAt(cont))), empty)
 						.toString();
