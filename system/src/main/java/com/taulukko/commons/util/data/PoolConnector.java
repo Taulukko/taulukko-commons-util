@@ -6,6 +6,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 
+/*Utilizar o pool da apache commons*/
+@Deprecated
 public class PoolConnector
 {
 

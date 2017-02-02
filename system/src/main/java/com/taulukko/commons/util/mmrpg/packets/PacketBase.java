@@ -1,7 +1,6 @@
 package com.taulukko.commons.util.mmrpg.packets;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Date;
@@ -10,7 +9,6 @@ import com.taulukko.commons.util.lang.EByte;
 import com.taulukko.commons.util.mmrpg.ICommonRequests;
 import com.taulukko.commons.util.mmrpg.IConfigHeader;
 import com.taulukko.commons.util.mmrpg.IPriority;
-import com.taulukko.commons.util.mmrpg.PacketManager;
 import com.taulukko.commons.util.mmrpg.Session;
 
 public class PacketBase implements IPriority, ICommonRequests

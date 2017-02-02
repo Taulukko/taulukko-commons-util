@@ -30,6 +30,16 @@
 	 <!-- [ means closet, inclusive. ) means open, excluisive. Eg. [1.0.0,2.0.0) means 1.0.0 - >  2.0.0 (except 2.0.0)-->
 	<dependencies>
 
+		<!-- groovy --> 
+		<!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
+		<dependency>
+		    <groupId>org.codehaus.groovy</groupId>
+		    <artifactId>groovy-all</artifactId>
+		    <version>2.4.8</version>
+		</dependency>
+
+		<!-- end groovy -->
+		
 		<dependency>
 	      <groupId>junit</groupId>
 	      <artifactId>junit</artifactId>
@@ -175,6 +185,38 @@
                     <encoding>${encoding}</encoding>
                 </configuration>
             </plugin>
+            
+            
+            			<!-- To total integration with eclipse and groovy, add groovy support 
+				from distribuition https://github.com/groovy/groovy-eclipse/wiki -->
+			<!-- To neon http://dist.springsource.org/snapshot/GRECLIPSE/e4.6/ -->
+			<!-- To luna http://dist.springsource.org/release/GRECLIPSE/e4.4/ -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<compilerId>groovy-eclipse-compiler</compilerId>
+					<argLine>-Dfile.encoding=${encoding}</argLine>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.codehaus.groovy</groupId>
+						<artifactId>groovy-eclipse-compiler</artifactId>
+						<version>2.9.1-01</version>
+					</dependency>
+					<!-- for 2.8.0-01 and later you must have an explicit dependency on 
+						groovy-eclipse-batch -->
+					<dependency>
+						<groupId>org.codehaus.groovy</groupId>
+						<artifactId>groovy-eclipse-batch</artifactId>
+						<version>2.3.7-01</version>
+					</dependency>
+				</dependencies>
+
+			</plugin>
 		</plugins>
 
 	</build>

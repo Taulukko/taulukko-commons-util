@@ -13,8 +13,6 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Statement;
 
-import com.taulukko.commons.util.lang.EString;
-
 /**
  * @author ecarli
  * 

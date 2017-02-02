@@ -141,12 +141,9 @@ public abstract class ConfigBase {
 
 	protected String realPath;
 
-	protected boolean j2ee = false;
-
 	public <T extends ConfigBase> ConfigBase(Reloadable reloadable,
-			boolean j2ee, Class<T> clazz) {
+			Class<T> clazz) {
 		this.reloadable = reloadable;
-		this.j2ee = j2ee;
 		ConfigBase.instances.put(clazz, this);
 	}
 
@@ -160,7 +157,7 @@ public abstract class ConfigBase {
 			throws Exception {
 
 		T config = builder.createNewConfig();
-		if (!realPath.endsWith("/") || !realPath.endsWith("\\")) {
+		if (!realPath.endsWith("/") && !realPath.endsWith("\\")) {
 			realPath += "/";
 		}
 
@@ -168,23 +165,11 @@ public abstract class ConfigBase {
 		config.projectName = projectName;
 		config.realPath = realPath;
 
-		if (config.j2ee) {
-			ConfigBase.startByURI(
-					clazz,
-					new URI(
-							"file:///"
-									+ realPath
-									+ String.format("config/%s.properties",
-											projectName)));
-		} else {
-			ConfigBase.startByURI(
-					clazz,
-					new URI(
-							"file:///"
-									+ realPath
-									+ String.format("config/%s.properties",
-											projectName)));
-		}
+		ConfigBase.startByURI(
+				clazz,
+				new URI("file:///" + realPath
+						+ String.format("config/%s.properties", projectName)));
+
 		ConfigBase.<T> reloadProperties(clazz);
 
 	}
@@ -268,29 +253,31 @@ public abstract class ConfigBase {
 	static <T extends ConfigBase> void startByURI(Class<T> clazz, URI uri)
 			throws Exception {
 		ConfigBase config = getInstance(clazz);
-		config.startByURI(uri, true);
+		config.startByURI(uri, true, false);
 	}
 
-	private void startByURI(URI uri, boolean tryAgain) throws Exception {
+	private void startByURI(URI uri, boolean tryAgain, boolean retryUsingJ2EE)
+			throws Exception {
 
 		this.lastURI = uri;
 		File file = new File(uri);
 
 		if (!file.exists()) {
 
-			if (tryAgain) {
-				if (this.j2ee) {
+			if (tryAgain | retryUsingJ2EE) {
+				if (retryUsingJ2EE) {
 					this.startByURI(
 							new URI("file:///"
 									+ this.realPath.replace('\\', '/')
-									+ "/WEB-INF/classes/config/"
-									+ this.projectName + ".properties"), false);
+									+ "WEB-INF/classes/config/"
+									+ this.projectName + ".properties"), false,
+							false);
 				} else {
 					this.startByURI(
 							new URI("file:///"
 									+ this.realPath.replace('\\', '/')
-									+ "/config/" + this.projectName
-									+ ".properties"), false);
+									+ "config/" + this.projectName
+									+ ".properties"), false, true);
 				}
 				return;
 			} else {
