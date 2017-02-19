@@ -1,7 +1,7 @@
 package com.taulukko.commons.util.config;
 
-import java.util.Properties;
+import java.util.Map;
 
 public interface Reloadable {
-	public void reload(ConfigBase configbase, Properties properties);
+	public void reload(ConfigBase configbase, Map<String,String> properties);
 }

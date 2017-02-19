@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -141,8 +142,9 @@ public abstract class ConfigBase {
 
 	protected String realPath;
 
-	public <T extends ConfigBase> ConfigBase(Reloadable reloadable,
-			Class<T> clazz) {
+	public Map<String, String> others;
+
+	public <T extends ConfigBase> ConfigBase(Reloadable reloadable, Class<T> clazz) {
 		this.reloadable = reloadable;
 		ConfigBase.instances.put(clazz, this);
 	}
@@ -152,9 +154,8 @@ public abstract class ConfigBase {
 		return (T) instances.get(clazz);
 	}
 
-	public static <T extends ConfigBase> void startDefault(Class<T> clazz,
-			ConfigBuilder<T> builder, String projectName, String realPath)
-			throws Exception {
+	public static <T extends ConfigBase> void startDefault(Class<T> clazz, ConfigBuilder<T> builder, String projectName,
+			String realPath) throws Exception {
 
 		T config = builder.createNewConfig();
 		if (!realPath.endsWith("/") && !realPath.endsWith("\\")) {
@@ -165,12 +166,10 @@ public abstract class ConfigBase {
 		config.projectName = projectName;
 		config.realPath = realPath;
 
-		ConfigBase.startByURI(
-				clazz,
-				new URI("file:///" + realPath
-						+ String.format("config/%s.properties", projectName)));
+		ConfigBase.startByURI(clazz,
+				new URI("file:///" + realPath + String.format("config/%s.properties", projectName)), projectName);
 
-		ConfigBase.<T> reloadProperties(clazz);
+		ConfigBase.<T>reloadProperties(clazz);
 
 	}
 
@@ -183,8 +182,7 @@ public abstract class ConfigBase {
 		}
 	}
 
-	protected static <T extends ConfigBase> void reloadProperties(
-			final Class<T> clazz) {
+	protected static <T extends ConfigBase> void reloadProperties(final Class<T> clazz) {
 		final ConfigBase config = getInstance(clazz);
 		config.thread = new Thread(new Runnable() {
 			@Override
@@ -202,8 +200,7 @@ public abstract class ConfigBase {
 						}
 						File properties = new File(config.lastURI);
 
-						EFileBufferReader reader = new EFileBufferReader(
-								properties.getAbsolutePath());
+						EFileBufferReader reader = new EFileBufferReader(properties.getAbsolutePath());
 						String content = reader.toString();
 						int size = content.length();
 						reader.close();
@@ -221,7 +218,7 @@ public abstract class ConfigBase {
 						}
 
 						synchronized (config.lastURI) {
-							ConfigBase.<T> startByURI(clazz, config.lastURI);
+							ConfigBase.<T>startByURI(clazz, config.lastURI, config.projectName);
 						}
 
 						for (ConfigObserver observer : config.reloadObservers) {
@@ -250,34 +247,27 @@ public abstract class ConfigBase {
 		System.out.println(value);
 	}
 
-	static <T extends ConfigBase> void startByURI(Class<T> clazz, URI uri)
-			throws Exception {
+	static <T extends ConfigBase> void startByURI(Class<T> clazz, URI uri, String projectname) throws Exception {
 		ConfigBase config = getInstance(clazz);
-		config.startByURI(uri, true, false);
+		config.startByURI(uri, true, false, projectname);
 	}
 
-	private void startByURI(URI uri, boolean tryAgain, boolean retryUsingJ2EE)
-			throws Exception {
+	private void startByURI(URI uri, boolean tryAgain, boolean retryUsingJ2EE, String projectname) throws Exception {
 
 		this.lastURI = uri;
 		File file = new File(uri);
 
 		if (!file.exists()) {
 
+			System.out.println("[INFO] -  " + projectName + " - Fail load config file from " + uri.toString());
+
 			if (tryAgain | retryUsingJ2EE) {
 				if (retryUsingJ2EE) {
-					this.startByURI(
-							new URI("file:///"
-									+ this.realPath.replace('\\', '/')
-									+ "WEB-INF/classes/config/"
-									+ this.projectName + ".properties"), false,
-							false);
+					this.startByURI(new URI("file:///" + this.realPath.replace('\\', '/') + "WEB-INF/classes/config/"
+							+ this.projectName + ".properties"), false, false, projectName);
 				} else {
-					this.startByURI(
-							new URI("file:///"
-									+ this.realPath.replace('\\', '/')
-									+ "config/" + this.projectName
-									+ ".properties"), false, true);
+					this.startByURI(new URI("file:///" + this.realPath.replace('\\', '/') + "config/" + this.projectName
+							+ ".properties"), false, true, projectName);
 				}
 				return;
 			} else {
@@ -285,129 +275,134 @@ public abstract class ConfigBase {
 			}
 		}
 
-		Properties properties = new Properties();
-
 		InputStream is = new FileInputStream(file.getAbsolutePath());
-		properties.load(is);
+		Properties tempProp = new Properties();
+		tempProp.load(is);
 		is.close();
 
-		String property = properties.getProperty("accessLevel", null);
+		others = new HashMap<>();
+
+		for (Object key : tempProp.keySet()) {
+			others.put(key.toString(), tempProp.getProperty(key.toString(), null));
+		}
+
+		String property = others.get("accessLevel");
 		if (property != null) {
 			this.accessLevel = String.valueOf(property);
 		}
 
-		property = properties.getProperty("clusterId", null);
+		property = others.get("clusterId");
 		if (property != null) {
 			this.clusterId = property;
 		}
 
-		property = properties.getProperty("emailSleepTime", null);
+		property = others.get("emailSleepTime");
 		if (property != null) {
 			this.emailSleepTime = Integer.valueOf(property);
 		}
 
-		property = properties.getProperty("accessPath", null);
+		property = others.get("accessPath");
 		if (property != null) {
 			this.accessPath = String.valueOf(property);
 		}
 
-		property = properties.getProperty("accessPattern", null);
+		property = others.get("accessPattern");
 		if (property != null) {
 			this.accessPattern = String.valueOf(property);
 		}
 
-		property = properties.getProperty("rootLevel", null);
+		property = others.get("rootLevel");
 		if (property != null) {
 			this.rootLevel = String.valueOf(property);
 		}
 
-		property = properties.getProperty("rootPath", null);
+		property = others.get("rootPath");
 		if (property != null) {
 			this.rootPath = String.valueOf(property);
 		}
 
-		property = properties.getProperty("rootPattern", null);
+		property = others.get("rootPattern");
 		if (property != null) {
 			this.rootPattern = String.valueOf(property);
 		}
 
-		property = properties.getProperty("serverCreated", null);
+		property = others.get("serverCreated");
 		if (property != null) {
 			this.serverCreated = String.valueOf(property);
 		}
 
-		property = properties.getProperty("serverDebug", null);
+		property = others.get("serverDebug");
 		if (property != null) {
 			this.serverDebug = Boolean.valueOf(property);
 		}
 
-		property = properties.getProperty("serverVersion", null);
+		property = others.get("serverVersion");
 		if (property != null) {
 			this.serverVersion = String.valueOf(property);
 		}
 
-		property = properties.getProperty("stdOutLevel", null);
+		property = others.get("stdOutLevel");
 		if (property != null) {
 			this.stdOutLevel = String.valueOf(property);
 		}
 
-		property = properties.getProperty("stdOutPattern", null);
+		property = others.get("stdOutPattern");
 		if (property != null) {
 			this.stdOutPattern = String.valueOf(property);
 		}
 
-		property = properties.getProperty("stdOutPath", null);
+		property = others.get("stdOutPath");
 		if (property != null) {
 			this.stdOutPath = String.valueOf(property);
 		}
 
-		property = properties.getProperty("sqlLevel", null);
+		property = others.get("sqlLevel");
 		if (property != null) {
 			this.sqlLevel = String.valueOf(property);
 		}
 
-		property = properties.getProperty("sqlPattern", null);
+		property = others.get("sqlPattern");
 		if (property != null) {
 			this.sqlPattern = String.valueOf(property);
 		}
 
-		property = properties.getProperty("sqlPath", null);
+		property = others.get("sqlPath");
 		if (property != null) {
 			this.sqlPath = String.valueOf(property);
 		}
 
-		property = properties.getProperty("emailSendEnabled", null);
+		property = others.get("emailSendEnabled");
 		if (property != null) {
 			this.emailSendEnabled = Boolean.valueOf(property);
 		}
 
-		property = properties.getProperty("browserShowJSErrors", null);
+		property = others.get("browserShowJSErrors");
 		if (property != null) {
 			this.browserShowJSErrors = Boolean.valueOf(property);
 		}
 
-		property = properties.getProperty("email", null);
+		property = others.get("email");
 		if (property != null) {
 			this.email = property;
 		}
 
-		property = properties.getProperty("emailPassword", null);
+		property = others.get("emailPassword");
 		if (property != null) {
 			this.emailPassword = property;
 		}
 
-		property = properties.getProperty("emailSmtp", null);
+		property = others.get("emailSmtp");
 		if (property != null) {
 			this.emailSmtp = property;
 		}
 
-		property = properties.getProperty("emailMaxFIFO", null);
+		property = others.get("emailMaxFIFO");
 		if (property != null) {
 			this.emailMaxFIFO = Integer.parseInt(property);
 		}
 
 		if (this.reloadable != null) {
-			this.reloadable.reload(this, properties);
+			this.reloadable.reload(this, others);
 		}
 
 	}

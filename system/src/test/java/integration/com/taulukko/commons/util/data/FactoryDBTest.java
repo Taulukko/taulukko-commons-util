@@ -31,7 +31,7 @@ public class FactoryDBTest implements IFactory {
 			String username = "root";
 			String password = "PWS";
 
-			url = "jdbc:mysql://localhost:3309/rpg?autoReconnect=true";
+			url = "jdbc:mysql://localhost:3306/rpg?autoReconnect=true";
 
  
 			ds.setDriverClassName(driver);
