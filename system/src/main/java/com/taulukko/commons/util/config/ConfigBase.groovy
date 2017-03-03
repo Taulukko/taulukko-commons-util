@@ -1,14 +1,5 @@
 package com.taulukko.commons.util.config;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -16,9 +7,12 @@ import com.taulukko.commons.util.io.EFile;
 import com.taulukko.commons.util.io.EFileBufferReader;
 import com.taulukko.commons.util.lang.EDate;
 
-public abstract class ConfigBase {
+ abstract class ConfigBase<T extends ConfigBase> implements Map<String, Object> {
 
 	private static Map<Class<? extends ConfigBase>, ConfigBase> instances = new ConcurrentHashMap<>();
+	
+	
+	Map<String, Object> extended = new HashMap<>();
 
 	// //////////////////
 	// SERVER//
@@ -26,31 +20,31 @@ public abstract class ConfigBase {
 
 	// Servidor em estado debug imprime mais logs e desliga coisas denecesírias
 	// Default: false
-	public boolean serverDebug = false;
+	 boolean serverDebug = false;
 
 	// Versao do sistema
 	// Default: 0.4
-	public String serverVersion = "0.4";
+	 String serverVersion = "0.4";
 
 	// Data de Criaíao do sistema
 	// Default: 01-08-2008
-	public String serverCreated = "01-08-2008";
+	 String serverCreated = "01-08-2008";
 
 	// Tempo de espera em ms entre um envio de email e outro
 	// Default: 60000 (1 min)
-	public int emailSleepTime = 60000;
+	 int emailSleepTime = 60000;
 
 	// Enable Email, if true thread send emails
 	// Default: true
-	public boolean emailSendEnabled = true;
+	 boolean emailSendEnabled = true;
 
 	// Show erros in browser. If enabled the browser show errors
 	// Default: false
 	// Sugestion: Keep true in developer time
-	public boolean browserShowJSErrors = true;
+	 boolean browserShowJSErrors = true;
 
 	// ID do cluster do servidor
-	public String clusterId = "01";
+	 String clusterId = "01";
 
 	// ////////
 	// LOG//
@@ -60,57 +54,57 @@ public abstract class ConfigBase {
 	// Default: [%d{yyyy-MMM-dd hh:mm}]%-5p[%t]- %m%n
 	// Sugestão para Debug (mais lento): [%d{yyyy-MMM-dd hh:mm}]%-5p[%t](%F:%L)
 	// - %m%n
-	public String rootPattern = "[%d{yyyy-MMM-dd hh:mm}]%-5p[%t]- %m%n";
+	 String rootPattern = "[%d{yyyy-MMM-dd hh:mm}]%-5p[%t]- %m%n";
 
 	// Caminho do log do root
 	// Default: /home/taulukko/logs/root.log
-	public String rootPath = "/home/taulukko/logs/root.log";
+	 String rootPath = "/home/taulukko/logs/root.log";
 
 	// Nível de log do root
 	// Default: warning
-	public String rootLevel = "warning";
+	 String rootLevel = "warning";
 
 	// forma de saída do log stdOut
 	// Default: [%d{yyyy-MMM-dd hh:mm}]%-5p[%t]- %m%n
 	// Sugestão para Debug (mais lento): [%d{yyyy-MMM-dd hh:mm}]%-5p[%t](%F:%L)
 	// - %m%n
-	public String stdOutPattern = "[%d{yyyy-MMM-dd hh:mm}]%-5p[%t]- %m%n";
+	 String stdOutPattern = "[%d{yyyy-MMM-dd hh:mm}]%-5p[%t]- %m%n";
 
 	// Caminho do log
 	// Default: /home/taulukko/logs/stdout.log
-	public String stdOutPath = "/home/taulukko/logs/stdout.log";
+	 String stdOutPath = "/home/taulukko/logs/stdout.log";
 
 	// Nível de log do root
 	// Default: warning
-	public String stdOutLevel = "warning";
+	 String stdOutLevel = "warning";
 
 	// forma de saída do log access
 	// Default: [%d{yyyy-MMM-dd hh:mm}]%-5p[%t]- %m%n
 	// Sugestão para Debug (mais lento): [%d{yyyy-MMM-dd hh:mm}]%-5p[%t](%F:%L)
 	// - %m%n
-	public String accessPattern = "[%d{yyyy-MMM-dd hh:mm}]%-5p[%t]- %m%n";
+	 String accessPattern = "[%d{yyyy-MMM-dd hh:mm}]%-5p[%t]- %m%n";
 
 	// Caminho do log access
 	// Default: /home/taulukko/logs/access.log
-	public String accessPath = "/home/taulukko/logs/access.log";
+	 String accessPath = "/home/taulukko/logs/access.log";
 
 	// Nível de log access
 	// Default: warning
-	public String accessLevel = "warning";
+	 String accessLevel = "warning";
 
 	// forma de saída do log sql
 	// Default: [%d{yyyy-MMM-dd hh:mm}]%-5p[%t]- %m%n
 	// Sugestão para Debug (mais lento): [%d{yyyy-MMM-dd hh:mm}]%-5p[%t](%F:%L)
 	// - %m%n
-	public String sqlPattern = "[%d{yyyy-MMM-dd hh:mm}]%-5p[%t]- %m%n";
+	 String sqlPattern = "[%d{yyyy-MMM-dd hh:mm}]%-5p[%t]- %m%n";
 
 	// Caminho do log
 	// Default: /home/taulukko/logs/sql.log
-	public String sqlPath = "/home/taulukko/logs/sql.log";
+	 String sqlPath = "/home/taulukko/logs/sql.log";
 
 	// Nível de log
 	// Default: warning
-	public String sqlLevel = "warning";
+	 String sqlLevel = "warning";
 
 	// ////////
 	// LOG//
@@ -118,9 +112,9 @@ public abstract class ConfigBase {
 	// ////////
 	// EMAIL DEFAULT//
 	// ////////
-	public String email = "taulukko@taulukko.com.br";
-	public String emailPassword = "smyghof7";
-	public String emailSmtp = "smtp.gmail.com";
+	 String email = "taulukko@taulukko.com.br";
+	 String emailPassword = "smyghof7";
+	 String emailSmtp = "smtp.gmail.com";
 
 	private List<ConfigObserver> reloadObservers = new CopyOnWriteArrayList<ConfigObserver>();
 
@@ -130,7 +124,7 @@ public abstract class ConfigBase {
 
 	// Máximos de emails na fila antes de aviso via SMS
 	// Padrão: 10
-	public int emailMaxFIFO = 10;
+	 int emailMaxFIFO = 10;
 
 	private boolean live = true;
 
@@ -142,19 +136,94 @@ public abstract class ConfigBase {
 
 	protected String realPath;
 
-	public Map<String, String> others;
-
-	public <T extends ConfigBase> ConfigBase(Reloadable reloadable, Class<T> clazz) {
+	
+	  ConfigBase(Reloadable reloadable, Class<T > clazz) {
 		this.reloadable = reloadable;
 		ConfigBase.instances.put(clazz, this);
 	}
+	
+	// MAP implementation
 
-	@SuppressWarnings("unchecked")
-	public static <T extends ConfigBase> T getInstance(Class<T> clazz) {
+	@Override
+	 int size() {
+		return extended.size();
+	}
+
+	@Override
+	 boolean isEmpty() {
+		return false;
+	}
+
+	@Override
+	 boolean containsKey(Object key) {
+		return extended.containsKey(key);
+	}
+
+	@Override
+	 boolean containsValue(Object value) {
+		return extended.containsValue(value);
+	}
+
+	@Override
+	 Object get(Object key) {
+		return extended.get(key);
+	}
+
+	@Override
+	 Object put(String key, Object value) {
+		return extended.put(key, value);
+	}
+
+	@Override
+	 Object remove(Object key) {
+		throw new RuntimeException("Config is read only");
+	}
+
+	@Override
+	 void putAll(Map<? extends String, ? extends Object> m) {
+		extended.putAll(m);
+	}
+
+	@Override
+	 void clear() {
+		throw new RuntimeException("Config is read only");
+	}
+
+	@Override
+	 Set<String> keySet() {
+		return extended.keySet();
+	}
+
+	@Override
+	 Collection<Object> values() {
+		return extended.values();
+	}
+
+	@Override
+	 Set<Entry<String, Object>> entrySet() {
+		return extended.entrySet();
+	}
+
+	@Override
+	 int hashCode() {
+		return extended.hashCode();
+	}
+
+	@Override
+	 boolean equals(Object obj) {
+		if (!(obj instanceof ConfigBase)) {
+			return false;
+		}
+		return extended.equals(obj);
+	}
+
+	// end map implementation 
+ 
+	 static <T extends ConfigBase> T getInstance(Class<T> clazz) {
 		return (T) instances.get(clazz);
 	}
 
-	public static <T extends ConfigBase> void startDefault(Class<T> clazz, ConfigBuilder<T> builder, String projectName,
+	 static <T extends ConfigBase> void startDefault(Class<T> clazz, ConfigBuilder<T> builder, String projectName,
 			String realPath) throws Exception {
 
 		T config = builder.createNewConfig();
@@ -173,7 +242,7 @@ public abstract class ConfigBase {
 
 	}
 
-	public void stopDefault() {
+	 void stopDefault() {
 		try {
 			this.live = false;
 			this.thread.join();
@@ -186,7 +255,7 @@ public abstract class ConfigBase {
 		final ConfigBase config = getInstance(clazz);
 		config.thread = new Thread(new Runnable() {
 			@Override
-			public void run() {
+			 void run() {
 
 				while (config.live) {
 					try {
@@ -247,12 +316,12 @@ public abstract class ConfigBase {
 		System.out.println(value);
 	}
 
-	static <T extends ConfigBase> void startByURI(Class<T> clazz, URI uri, String projectname) throws Exception {
-		ConfigBase config = getInstance(clazz);
-		config.startByURI(uri, true, false, projectname);
+	static void startByURI(Class<T> clazz, URI uri, String projectname) throws Exception {
+		T cfg = getInstance(clazz);
+		cfg.startByURIInternal(uri, true, false, projectname);
 	}
 
-	private void startByURI(URI uri, boolean tryAgain, boolean retryUsingJ2EE, String projectname) throws Exception {
+	void startByURIInternal(URI uri, boolean tryAgain, boolean retryUsingJ2EE, String projectname) throws Exception {
 
 		this.lastURI = uri;
 		File file = new File(uri);
@@ -263,10 +332,10 @@ public abstract class ConfigBase {
 
 			if (tryAgain | retryUsingJ2EE) {
 				if (retryUsingJ2EE) {
-					this.startByURI(new URI("file:///" + this.realPath.replace('\\', '/') + "WEB-INF/classes/config/"
+					this.startByURIInternal(new URI("file:///" + this.realPath.replace('\\', '/') + "WEB-INF/classes/config/"
 							+ this.projectName + ".properties"), false, false, projectName);
 				} else {
-					this.startByURI(new URI("file:///" + this.realPath.replace('\\', '/') + "config/" + this.projectName
+					this.startByURIInternal(new URI("file:///" + this.realPath.replace('\\', '/') + "config/" + this.projectName
 							+ ".properties"), false, true, projectName);
 				}
 				return;
@@ -280,13 +349,13 @@ public abstract class ConfigBase {
 		tempProp.load(is);
 		is.close();
 
-		others = new HashMap<>();
+		Map<String, Object> others = extended;
 
 		for (Object key : tempProp.keySet()) {
 			others.put(key.toString(), tempProp.getProperty(key.toString(), null));
 		}
 
-		String property = others.get("accessLevel");
+		def property = others.get("accessLevel");
 		if (property != null) {
 			this.accessLevel = String.valueOf(property);
 		}
@@ -407,7 +476,7 @@ public abstract class ConfigBase {
 
 	}
 
-	public void save(String propertie, String value) throws Exception {
+	 void save(String propertie, String value) throws Exception {
 
 		File file = new File(this.lastURI);
 		if (!file.exists()) {
@@ -428,29 +497,25 @@ public abstract class ConfigBase {
 
 	}
 
-	public void addObserver(String type, ConfigObserver observer) {
+	 void addObserver(String type, ConfigObserver observer) {
 
 		if (observer != null && type.toLowerCase().equals("reload")) {
 			this.reloadObservers.add(observer);
 		}
 	}
 
-	public boolean removeObserver(String type, ConfigObserver observer) {
+	 boolean removeObserver(String type, ConfigObserver observer) {
 		if (observer != null && type.toLowerCase().equals("reload")) {
 			return this.reloadObservers.remove(observer);
 		}
 		return false;
 	}
 
-	public void clearObserver(String type) {
+	 void clearObserver(String type) {
 		if (type.toLowerCase().equals("reload")) {
 			this.reloadObservers.clear();
 		}
 	}
 
-	public static interface ConfigObserver {
-		public void before();
-
-		public void after();
-	}
+	  
 }
