@@ -42,6 +42,12 @@ class ConfigBaseTest {
 	}
 
 	@Test
+	void loaded() {
+		assert config.get
+	}
+
+	
+	@Test
 	void propertyBasicConfig() {
 		assert "01-08-2008" == config.getServerCreated();
 		def x = config.getExtended();
