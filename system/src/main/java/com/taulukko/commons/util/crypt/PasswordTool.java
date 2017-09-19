@@ -145,8 +145,7 @@ public class PasswordTool
 	{
 		try
 		{
-
-			// cria a conta no l2-login
+ 
 			MessageDigest md = MessageDigest.getInstance(MD5);
 			byte[] raw = sPassword.getBytes("UTF-8");
 			byte[] hash = md.digest(raw);
@@ -166,8 +165,7 @@ public class PasswordTool
 	{
 		try
 		{
-
-			// cria a conta no l2-login
+ 
 			MessageDigest md = MessageDigest.getInstance(sMethod);
 			byte[] raw = sPassword.getBytes("UTF-8");
 			byte[] hash = md.digest(raw);

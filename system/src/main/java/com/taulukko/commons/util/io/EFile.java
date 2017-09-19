@@ -14,7 +14,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
+
+import javax.management.RuntimeErrorException;
 
 import com.taulukko.commons.util.lang.EMath;
 import com.taulukko.commons.util.lang.EString;
@@ -26,53 +32,85 @@ import com.taulukko.commons.util.lang.EString;
  *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class EFile extends EAbstractFile {
+
+	public enum SourceFileType {
+		PATH(1), RESOURCE(2), URI(3), URL(4);
+
+		int type = 0;
+
+		SourceFileType(int type) {
+			this.type = type;
+		}
+
+	}
+
 	public static final int TP_SPLIT_SIZE_NAME_SUPORT = 3;
 
-	private int _sizeBuffer = (int) TP_MEGA;
+	private int sizeBufer = (int) TP_MEGA;
 
 	public static void main(String argsv[]) {
 		EFile file = new EFile("~/teste.htm");
 		System.out.println(file.getType());
-		/*
-		 * try { System.out.println("Copiando arquivo:"); EFile file = new
-		 * EFile("c:/teste.txt");
-		 * 
-		 * file.copyTo("c:/teste2.txt");
-		 * 
-		 * System.out.println("Quebrando um arquivo em 2"); EFile old = new
-		 * EFile("c:/teste.zip"); if (old.exists()) { old.delete(); }
-		 * 
-		 * old = new EFile("c:/test.txt"); if (old.exists()) { old.delete(); }
-		 * 
-		 * System.out.println("Criando arquivo teste"); EFile test = new
-		 * EFile("c:/test.txt"); BufferedWriter out = test.createFile();
-		 * 
-		 * for (int cont = 0; cont < 100000; cont++) {
-		 * out.write("[%d]ISSO EH UM TESTE".replaceFirst("%d", String
-		 * .valueOf(cont)) + EString.FL_NEW_LINE); } out.close();
-		 * 
-		 * System.out.println("Dividindo arquivos em arquivos de 3KB");
-		 * test.split((int) (1.1 * TP_MEGA));
-		 * System.out.println("Renomeando arquivo original");
-		 * test.rename("c:/test.ori"); System.out
-		 * .println("Juntando os arquivos divididos em um unico arquivo");
-		 * test.join("C:/test.txt.001"); } catch (Exception e) {
-		 * e.printStackTrace(); }
-		 */
+
 	}
 
-	public EFile(String sPath) {
-		super(new File(sPath));
+	public EFile(String path) {
+		this(path, SourceFileType.PATH);
+	}
+
+	public EFile(String path, SourceFileType sourceType) {
+		super(loadFile(path, sourceType));
+	}
+
+	private static File loadFile(String path, SourceFileType sourceType) throws RuntimeException {
+		URL url = null;
+		switch (sourceType) {
+		case RESOURCE: {
+			// convert resource to url
+			ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+			path = EFile.getClassLoaderPath() + path;
+			url = classLoader.getResource(path);
+			if (url == null) {
+				throw new RuntimeException("File [" + path + "] not found");
+			}
+		}
+		case URL: {
+			// convert url to path
+			try {
+				if (url == null) {
+					url = new URL(path);
+				}
+				path = url.getFile();
+			} catch (MalformedURLException e) {
+				throw new RuntimeErrorException(new Error(e));
+			}
+		}
+		case PATH:
+			// resolve path
+			return new File(path);
+
+		case URI: {
+			// resolve uri
+			try {
+				URI uri = new URI(path);
+				return new File(uri);
+			} catch (URISyntaxException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		default:
+			return null;
+		}
 	}
 
 	public EFile(File file) {
 		super(file);
 	}
 
-	public static String getWorkPath() {
+	public static String getWorkPath() { 
 		return new File(".").getAbsolutePath();
 	}
-	
+
 	public static String getClassLoaderPath() {
 		return EFile.class.getClassLoader().getResource(".").getPath();
 	}
@@ -85,53 +123,49 @@ public class EFile extends EAbstractFile {
 
 	public void split(String files[]) throws IOException {
 		/*
-		 * Como deve funcionar: A partir dos nomes recebidos, ele divide em
-		 * partes iguais o tamanho do arquivo original, exemplo: Se o arquivo
-		 * tem 100KB e foram passados 10 nomes de partes de arquivos, ento cada
-		 * parte ter 10KB.
+		 * Como deve funcionar: A partir dos nomes recebidos, ele divide em partes
+		 * iguais o tamanho do arquivo original, exemplo: Se o arquivo tem 100KB e foram
+		 * passados 10 nomes de partes de arquivos, ento cada parte ter 10KB.
 		 * 
-		 * Como desenvolver: Copiar a rotina atual de split para essa rotina.
-		 * Alterar para funcionar com nomes de arquivos em vez de tamanho mximo.
-		 * Depois de alterar a rotina, alterar para a antiga rotina de split,
-		 * chamar esta. Ai a antiga ter como nico trabalho gerar os nomes dos
-		 * arquivos, suficientes para no estourar o mximo fornecido.
+		 * Como desenvolver: Copiar a rotina atual de split para essa rotina. Alterar
+		 * para funcionar com nomes de arquivos em vez de tamanho mximo. Depois de
+		 * alterar a rotina, alterar para a antiga rotina de split, chamar esta. Ai a
+		 * antiga ter como nico trabalho gerar os nomes dos arquivos, suficientes para
+		 * no estourar o mximo fornecido.
 		 */
 		System.out.println("Nao implementado ainda.");
 	}
 
 	public void join(String files[]) throws IOException {
 		/*
-		 * Como deve funcionar: A partir dos nomes recebidos ele une todos no
-		 * arquivo atual (this).
+		 * Como deve funcionar: A partir dos nomes recebidos ele une todos no arquivo
+		 * atual (this).
 		 * 
-		 * Como desenvolver: Copiar a rotina atual de join para essa rotina.
-		 * Alterar para funcionar com nomes de arquivos em vez de nome inicial.
-		 * Depois de alterar a rotina, alterar para a antiga rotina de join,
-		 * chamar esta. Ai a antiga ter como nico trabalho gerar os nomes dos
-		 * arquivos.
+		 * Como desenvolver: Copiar a rotina atual de join para essa rotina. Alterar
+		 * para funcionar com nomes de arquivos em vez de nome inicial. Depois de
+		 * alterar a rotina, alterar para a antiga rotina de join, chamar esta. Ai a
+		 * antiga ter como nico trabalho gerar os nomes dos arquivos.
 		 */
 		System.out.println("Nao implementado ainda.");
 	}
 
 	public String[] split(int maxSize) throws IOException {
-		ArrayList<String> ret = new ArrayList<String>();
+		ArrayList<String> ret = new ArrayList<>();
 		RandomAccessFile fi = new RandomAccessFile(this.getJFile(), "r");
 		int len = (int) fi.length();
 		int filesLeft = len / maxSize;
 		int total = len / maxSize;
 		int buffSize = maxSize;
 		while (filesLeft >= 0) {
-			String fileNumber = new EString(new EString("0").repeat(
-					TP_SPLIT_SIZE_NAME_SUPORT).toString()
-					+ (total - filesLeft + 1)).right(TP_SPLIT_SIZE_NAME_SUPORT)
-					.toString();
+			String fileNumber = new EString(
+					new EString("0").repeat(TP_SPLIT_SIZE_NAME_SUPORT).toString() + (total - filesLeft + 1))
+							.right(TP_SPLIT_SIZE_NAME_SUPORT).toString();
 			if (filesLeft-- == 0) {
 				buffSize = len % maxSize;
 			}
 			byte buf[] = new byte[buffSize];
 			fi.read(buf, 0, buffSize);
-			String fileName = this.getJFile().getAbsolutePath() + "."
-					+ fileNumber;
+			String fileName = this.getJFile().getAbsolutePath() + "." + fileNumber;
 			ret.add(fileName);
 			FileOutputStream fo = new FileOutputStream(fileName);
 			fo.write(buf);
@@ -150,14 +184,12 @@ public class EFile extends EAbstractFile {
 			throw new FileNotFoundException();
 		}
 
-		String fileNumber = new EString(startFile).right(
-				TP_SPLIT_SIZE_NAME_SUPORT).toString();
+		String fileNumber = new EString(startFile).right(TP_SPLIT_SIZE_NAME_SUPORT).toString();
 		if (!EMath.isInteger(fileNumber)) {
 			throw new NameInvalidException();
 		}
 
-		String fileName = startFile.substring(0, startFile.length()
-				- TP_SPLIT_SIZE_NAME_SUPORT - 1);
+		String fileName = startFile.substring(0, startFile.length() - TP_SPLIT_SIZE_NAME_SUPORT - 1);
 
 		int fileActive = 0;
 
@@ -165,21 +197,20 @@ public class EFile extends EAbstractFile {
 
 		testFile = new EFile(fileName + "." + fileNumber);
 		fileNumber = new EString("0").repeat(TP_SPLIT_SIZE_NAME_SUPORT)
-				.concat(new EString(String.valueOf(++fileActive + 1)))
-				.right(TP_SPLIT_SIZE_NAME_SUPORT).toString();
+				.concat(new EString(String.valueOf(++fileActive + 1))).right(TP_SPLIT_SIZE_NAME_SUPORT).toString();
 
 		while (testFile.exists()) {
 
 			RandomAccessFile fi = new RandomAccessFile(testFile.getJFile(), "r");
 			// byte buf[] = new byte[(int) testFile.length()];
-			byte buf[] = new byte[_sizeBuffer];
-			int ret = fi.read(buf, 0, _sizeBuffer);
+			byte buf[] = new byte[sizeBufer];
+			int ret = fi.read(buf, 0, sizeBufer);
 			// System.out.println("ret=" + ret);
 
 			while (ret != -1) {
 				// System.out.println(new String(buf));
 				fo.write(buf, 0, ret);
-				ret = fi.read(buf, 0, _sizeBuffer);
+				ret = fi.read(buf, 0, sizeBufer);
 				// System.out.println("ret=" + ret);
 			}
 
@@ -190,8 +221,7 @@ public class EFile extends EAbstractFile {
 
 			testFile = new EFile(fileName + "." + fileNumber);
 			fileNumber = new EString("0").repeat(TP_SPLIT_SIZE_NAME_SUPORT)
-					.concat(new EString(String.valueOf(++fileActive + 1)))
-					.right(TP_SPLIT_SIZE_NAME_SUPORT).toString();
+					.concat(new EString(String.valueOf(++fileActive + 1))).right(TP_SPLIT_SIZE_NAME_SUPORT).toString();
 
 		}
 		fo.close();
@@ -218,14 +248,16 @@ public class EFile extends EAbstractFile {
 	}
 
 	public class NameInvalidException extends Exception {
+
+		private static final long serialVersionUID = -7250901304978482431L;
 	}
 
 	public int getSizeBuffer() {
-		return _sizeBuffer;
+		return sizeBufer;
 	}
 
 	public void setSizeBuffer(int sizeBuffer) {
-		_sizeBuffer = sizeBuffer;
+		sizeBufer = sizeBuffer;
 	}
 
 	public void copyTo(String path) throws IOException {
@@ -234,45 +266,35 @@ public class EFile extends EAbstractFile {
 		File toFile = new File(path);
 
 		if (!fromFile.exists())
-			throw new IOException("FileCopy: " + "no such source file: "
-					+ this.getAbsolutePath());
+			throw new IOException("FileCopy: " + "no such source file: " + this.getAbsolutePath());
 		if (!fromFile.isFile())
-			throw new IOException("FileCopy: " + "can't copy directory: "
-					+ this.getAbsolutePath());
+			throw new IOException("FileCopy: " + "can't copy directory: " + this.getAbsolutePath());
 		if (!fromFile.canRead())
-			throw new IOException("FileCopy: " + "source file is unreadable: "
-					+ this.getAbsolutePath());
+			throw new IOException("FileCopy: " + "source file is unreadable: " + this.getAbsolutePath());
 
 		if (toFile.isDirectory())
 			toFile = new File(toFile, fromFile.getName());
 
 		if (toFile.exists()) {
 			if (!toFile.canWrite())
-				throw new IOException("FileCopy: "
-						+ "destination file is unwriteable: " + path);
-			System.out.print("Overwrite existing file " + toFile.getName()
-					+ "? (Y/N): ");
+				throw new IOException("FileCopy: " + "destination file is unwriteable: " + path);
+			System.out.print("Overwrite existing file " + toFile.getName() + "? (Y/N): ");
 			System.out.flush();
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					System.in));
+			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 			String response = in.readLine();
 			if (!response.equals("Y") && !response.equals("y"))
-				throw new IOException("FileCopy: "
-						+ "existing file was not overwritten.");
+				throw new IOException("FileCopy: " + "existing file was not overwritten.");
 		} else {
 			String parent = toFile.getParent();
 			if (parent == null)
 				parent = System.getProperty("user.dir");
 			File dir = new File(parent);
 			if (!dir.exists())
-				throw new IOException("FileCopy: "
-						+ "destination directory doesn't exist: " + parent);
+				throw new IOException("FileCopy: " + "destination directory doesn't exist: " + parent);
 			if (dir.isFile())
-				throw new IOException("FileCopy: "
-						+ "destination is not a directory: " + parent);
+				throw new IOException("FileCopy: " + "destination is not a directory: " + parent);
 			if (!dir.canWrite())
-				throw new IOException("FileCopy: "
-						+ "destination directory is unwriteable: " + parent);
+				throw new IOException("FileCopy: " + "destination directory is unwriteable: " + parent);
 		}
 
 		FileInputStream from = null;
@@ -306,7 +328,5 @@ public class EFile extends EAbstractFile {
 		return partName[partName.length - 1];
 
 	}
-	
-	 
 
 }

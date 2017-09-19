@@ -117,6 +117,11 @@ public class EString implements Cloneable
 	{
 		return new EString(this.toString());
 	}
+	
+	public static EString of(String value)
+	{
+		return new EString(value);
+	}
 
 	/**
 	 * Autor: Edson Data: 25/07/2003 Dependencias: EString
@@ -127,9 +132,9 @@ public class EString implements Cloneable
 	 * @param b
 	 * @return
 	 */
-	public static EString join(String sValores[])
+	public static EString join(String sValores[]) 
 	{
-		return join(sValores, "", 0, sValores.length);
+		return join(sValores, "", 0, sValores.length); 
 	}
 
 	/**
