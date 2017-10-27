@@ -1,4 +1,4 @@
-package com.taulukko.common.groove.features;
+package com.taulukko.common.groovy.features;
 
 public class PropertyTestDTO {
 
