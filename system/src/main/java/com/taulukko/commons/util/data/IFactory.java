@@ -1,14 +1,14 @@
 package com.taulukko.commons.util.data;
 
-import java.sql.SQLException;
-
 import javax.sql.DataSource;
+
+import com.taulukko.commons.TaulukkoException;
 
 public interface IFactory
 {
 	
 	@Deprecated
 	/***Use getDataSource().getConnection()*/
-	public IEConector getConnector() throws SQLException;
-	public DataSource getDataSource() throws SQLException;
+	public IEConector getConnector() throws TaulukkoException;
+	public DataSource getDataSource() throws TaulukkoException;
 }

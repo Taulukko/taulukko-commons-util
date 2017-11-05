@@ -1,38 +1,33 @@
 package integration.com.taulukko.commons.util.data;
 
-import java.sql.SQLException;
-
 import javax.sql.DataSource;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.taulukko.commons.TaulukkoException;
 import com.taulukko.commons.util.data.Command;
 import com.taulukko.commons.util.data.EQueryRunner;
 import com.taulukko.commons.util.data.SingleObjectHandler;
 
-public class EQueryRunnerTest
-{
+public class EQueryRunnerTest {
 
 	private static DataSource datasource = null;
 
 	@BeforeClass
-	public static void before() throws SQLException
-	{
+	public static void before() throws TaulukkoException {
 		FactoryDBTest factory = new FactoryDBTest();
 		datasource = factory.getDataSource();
 	}
 
 	@Test
-	public void query() throws SQLException
-	{
+	public void query() throws TaulukkoException {
 		int total = contaCmps(6);
 		System.out.println("Foram encontradas " + total + " campanhas.");
 	}
 
-	private int contaCmps(int gmid) throws SQLException
-	{
+	private int contaCmps(int gmid) throws TaulukkoException {
 		EQueryRunner runner = new EQueryRunner(datasource);
 		String sql = "SELECT count(*) as total FROM cmps WHERE gmid = ?";
 		Command command = new Command(sql, gmid);
@@ -44,8 +39,7 @@ public class EQueryRunnerTest
 	}
 
 	@Test
-	public void update() throws SQLException
-	{
+	public void update() throws TaulukkoException {
 		int totalAntigo = contaCmps(6);
 
 		EQueryRunner runner = new EQueryRunner(datasource);

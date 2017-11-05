@@ -1,14 +1,10 @@
 package integration.com.taulukko.commons.util.data;
 
-import java.sql.SQLException;
-
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
- 
 
-
-
+import com.taulukko.commons.TaulukkoException;
 import com.taulukko.commons.util.data.EConectorMySQL;
 import com.taulukko.commons.util.data.IEConector;
 import com.taulukko.commons.util.data.IFactory;
@@ -18,10 +14,10 @@ public class FactoryDBTest implements IFactory {
 	private static DataSource dataSource = null;
 
 	public FactoryDBTest() {
-		if (dataSource != null ) {
+		if (dataSource != null) {
 			return;
 		}
-		 
+
 		try {
 
 			BasicDataSource ds = new BasicDataSource();
@@ -33,7 +29,6 @@ public class FactoryDBTest implements IFactory {
 
 			url = "jdbc:mysql://localhost:3306/rpg?autoReconnect=true";
 
- 
 			ds.setDriverClassName(driver);
 			ds.setUrl(url);
 			ds.setUsername(username);
@@ -52,18 +47,17 @@ public class FactoryDBTest implements IFactory {
 			System.out.println("open connection exception" + e);
 		}
 
-		
 	}
 
 	@Override
-	public IEConector getConnector() throws SQLException {
+	public IEConector getConnector() throws TaulukkoException {
 		IEConector con = new EConectorMySQL("root", "PWS", "localhost:3309", "rpg");
 		con.open();
 		return con;
 	}
 
 	@Override
-	public DataSource getDataSource() throws SQLException {
+	public DataSource getDataSource() throws TaulukkoException {
 		return dataSource;
 	}
 }

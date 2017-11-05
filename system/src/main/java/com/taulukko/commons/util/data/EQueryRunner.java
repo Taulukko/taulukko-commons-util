@@ -14,82 +14,73 @@ import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 
-public class EQueryRunner extends QueryRunner
-{
-	public EQueryRunner(DataSource datasource)
-	{
+import com.taulukko.commons.TaulukkoException;
+
+public class EQueryRunner extends QueryRunner {
+	public EQueryRunner(DataSource datasource) {
 		super(datasource);
 	}
 
-	public EQueryRunner(boolean pmdKnownBroken)
-	{
+	public EQueryRunner(boolean pmdKnownBroken) {
 		super(pmdKnownBroken);
 	}
 
-	public EQueryRunner(DataSource ds, boolean pmdKnownBroken)
-	{
+	public EQueryRunner(DataSource ds, boolean pmdKnownBroken) {
 		super(ds, pmdKnownBroken);
 	}
 
-	public <T> T query(Command command, ResultSetHandler<T> rsh)
-			throws SQLException
-	{
-		return this.query(command.getSql(), rsh, command.getParameters());
+	public <T> T query(Command command, ResultSetHandler<T> rsh) throws TaulukkoException {
+		try {
+			return this.query(command.getSql(), rsh, command.getParameters());
+		} catch (SQLException e) {
+			throw new TaulukkoException(e);
+		}
 	}
 
-	public int update(Command command) throws SQLException
-	{
-		return this.update(command.getSql(), command.getParameters());
+	public int update(Command command) throws TaulukkoException {
+		try {
+			return this.update(command.getSql(), command.getParameters());
+		} catch (SQLException e) {
+			throw new TaulukkoException(e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> List<T> insert(Command command) throws SQLException
-	{
-		if (!command.getSql().trim().toUpperCase().startsWith("INSERT"))
-		{
-			throw new SQLException("Only insert commands are accept.");
+	public <T> List<T> insert(Command command) throws TaulukkoException {
+		if (!command.getSql().trim().toUpperCase().startsWith("INSERT")) {
+			throw new TaulukkoException("Only insert commands are accept.");
 		}
-		Connection con = this.getDataSource().getConnection();
+		Connection con = null;
+		PreparedStatement ps = null;
+		List<T> keys = new ArrayList<>();
+		try {
+			con = this.getDataSource().getConnection();
 
-		PreparedStatement ps = con.prepareStatement(command.getSql(),Statement.RETURN_GENERATED_KEYS);
-
-		List<T> keys = new ArrayList<T>();
-
-		try
-		{
+			ps = con.prepareStatement(command.getSql(), Statement.RETURN_GENERATED_KEYS);
 
 			Object parameters[] = command.getParameters();
-			for (int index = 0; index < parameters.length; index++)
-			{
-				ps.setObject(index+1, parameters[index]);
+			for (int index = 0; index < parameters.length; index++) {
+				ps.setObject(index + 1, parameters[index]);
 			}
 			ps.execute();
 
 			ResultSet generatedKeysRs = ps.getGeneratedKeys();
 
-			while (generatedKeysRs.next())
-			{
+			while (generatedKeysRs.next()) {
 				keys.add((T) generatedKeysRs.getObject(1));
 
 			}
 
-		}
-		catch (SQLException e)
-		{
-			throw e;
-		}
-		finally
-		{
-			try
-			{
-				ps.close();
-			}
-			catch (SQLException e)
-			{
-				throw e;
-			}
-			finally
-			{
+		} catch (SQLException e) {
+			throw new TaulukkoException(e);
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException e) {
+				throw new TaulukkoException(e);
+			} finally {
 				DbUtils.closeQuietly(con);
 			}
 		}
