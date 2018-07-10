@@ -19,10 +19,19 @@ import java.util.Date;
  */
 public class EDate
 {
-	public static long TP_SECOND_IN_MS = 1000;
+	
+	public static long TP_MILISECOND_IN_MS = 1;
+	public static long TP_SECOND_IN_MS = TP_MILISECOND_IN_MS * 1000;
 	public static long TP_MINUTE_IN_MS = TP_SECOND_IN_MS * 60;
 	public static long TP_HOUR_IN_MS = TP_MINUTE_IN_MS * 60;
 	public static long TP_DAY_IN_MS = TP_HOUR_IN_MS  * 24;
+	
+
+	public static long TP_MILISECOND_IN_NS =  1000000;
+	public static long TP_SECOND_IN_NS = TP_SECOND_IN_MS * TP_MILISECOND_IN_NS;
+	public static long TP_MINUTE_IN_NS =TP_MINUTE_IN_MS* TP_MILISECOND_IN_NS;
+	public static long TP_HOUR_IN_NS = TP_HOUR_IN_MS * TP_MILISECOND_IN_NS;
+	public static long TP_DAY_IN_NS = TP_DAY_IN_MS  * TP_MILISECOND_IN_NS;
 	
 	private Calendar m_calendar;
 

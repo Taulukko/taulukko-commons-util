@@ -25,9 +25,21 @@ import com.taulukko.commons.TaulukkoException;
  *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class EReflectionUtils extends ClassLoader {
+	
+	
 
-	@SuppressWarnings("rawtypes")
-	public static List<Class> getClassesFromPackage(String pckgname) throws TaulukkoException {
+ 
+	public static String getCaller() throws TaulukkoException {
+		return Thread.currentThread().getStackTrace()[2].toString();
+	}
+
+	public static String getCaller(int index) throws TaulukkoException {
+		return Thread.currentThread().getStackTrace()[index].toString();
+	}
+
+	
+
+	public static List<Class<?>> getClassesFromPackage(String pckgname) throws TaulukkoException {
 
 		// Get a File object for the package
 		File directory = null;
@@ -43,9 +55,9 @@ public class EReflectionUtils extends ClassLoader {
 		}
 
 		Predicate<String> filterClassFiles = f -> f.endsWith(".class");
-		Function<String, Class> maperClassNameToClass = name -> {
+		Function<String, Class<?>> maperClassNameToClass = name -> {
 			try {
-				return (Class) Class.forName(pckgname + "." + name.substring(0, name.length() - 6));
+				return (Class<?>) Class.forName(pckgname + "." + name.substring(0, name.length() - 6));
 			} catch (ClassNotFoundException e) {
 				throw new RuntimeException(e);
 			}
@@ -58,14 +70,14 @@ public class EReflectionUtils extends ClassLoader {
 
 	}
 
-	public Class loadClass(String sClassName, String sPath) throws TaulukkoException {
+	public Class<?> loadClass(String sClassName, String sPath) throws TaulukkoException {
 		try {
 
 			byte[] data;
 			// o endereco da classe que nao pertence ao classloader
 			data = loadClassData(sPath);
 			// setando a referencia
-			Class cls = defineClass(sClassName, data, 0, data.length, null);
+			Class<?> cls = defineClass(sClassName, data, 0, data.length, null);
 			// resolve
 			// resolveClass(cls);
 
