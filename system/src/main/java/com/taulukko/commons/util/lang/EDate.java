@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
+import com.taulukko.commons.util.lang.datetime.EMilisecond;
 
 /**
  * @author ecarli 
@@ -33,7 +34,7 @@ public class EDate
 	public static long TP_HOUR_IN_NS = TP_HOUR_IN_MS * TP_MILISECOND_IN_NS;
 	public static long TP_DAY_IN_NS = TP_DAY_IN_MS  * TP_MILISECOND_IN_NS;
 	
-	private Calendar m_calendar;
+	private Calendar calendar;
 
 	private static long m_lLastError;
 
@@ -45,14 +46,14 @@ public class EDate
 
 	public EDate(Calendar calendar)
 	{
-		m_calendar = Calendar.getInstance();
-		m_calendar.setTime(calendar.getTime());
+		calendar = Calendar.getInstance();
+		calendar.setTime(calendar.getTime());
 	}
 
 	public EDate(Date date)
 	{
-		m_calendar = Calendar.getInstance();
-		m_calendar.setTime(date);
+		calendar = Calendar.getInstance();
+		calendar.setTime(date);
 	}
 
 	public EDate(int iYear, int iMonth, int iDay)
@@ -68,10 +69,11 @@ public class EDate
 	public EDate(int iYear, int iMonth, int iDay, int iHour, int iMinute,
 			int iSecond)
 	{
-		m_calendar = Calendar.getInstance();
-		m_calendar.set(iYear, iMonth-1, iDay, iHour, iMinute, iSecond);
+		calendar = Calendar.getInstance();
+		calendar.set(iYear, iMonth-1, iDay, iHour, iMinute, iSecond);
 	}
 
+	@Deprecated
 	public static String getValue(ResultSet rs, String sField)
 			throws SQLException
 	{
@@ -94,37 +96,37 @@ public class EDate
 
 	public int getMilisecond()
 	{
-		return m_calendar.get(Calendar.MILLISECOND);
+		return calendar.get(Calendar.MILLISECOND);
 	}
 
 	public int getSecond()
 	{
-		return m_calendar.get(Calendar.SECOND);
+		return calendar.get(Calendar.SECOND);
 	}
 
 	public int getMinute()
 	{
-		return m_calendar.get(Calendar.MINUTE);
+		return calendar.get(Calendar.MINUTE);
 	}
 
 	public int getHour()
 	{
-		return m_calendar.get(Calendar.HOUR_OF_DAY);
+		return calendar.get(Calendar.HOUR_OF_DAY);
 	}
 
 	public int getDay()
 	{
-		return m_calendar.get(Calendar.DAY_OF_MONTH);
+		return calendar.get(Calendar.DAY_OF_MONTH);
 	}
 
 	public int getMonth()
 	{
-		return m_calendar.get(Calendar.MONTH) + 1;
+		return calendar.get(Calendar.MONTH) + 1;
 	}
 
 	public int getYear()
 	{
-		return m_calendar.get(Calendar.YEAR);
+		return calendar.get(Calendar.YEAR);
 	}
 
 	public long getLastError()
@@ -134,35 +136,46 @@ public class EDate
 
 	public void addDays(int iDays)
 	{
-		m_calendar.add(Calendar.DAY_OF_MONTH, iDays);
+		calendar.add(Calendar.DAY_OF_MONTH, iDays);
 	}
 
 	public void addHours(int iHours)
 	{
-		m_calendar.add(Calendar.HOUR, iHours);
+		calendar.add(Calendar.HOUR, iHours);
 	}
 
 	public void addMinutes(int iMinutes)
 	{
-		m_calendar.add(Calendar.MINUTE, iMinutes);
+		calendar.add(Calendar.MINUTE, iMinutes);
 	}
 
-	public EMilisecond dif(EDate date)
+	 
+	public  EMilisecond diff(EDate date)
 	{
-		long lThisTime = m_calendar.getTimeInMillis();
+		long lThisTime = calendar.getTimeInMillis();
 		long lParamDate = date.toJavaCalendar().getTimeInMillis();
-		return new EMilisecond(lThisTime - lParamDate);
+		return new  EMilisecond(lThisTime - lParamDate);
+	}
+
+	
+	@Deprecated
+	/*Use diff, correct EMilesecond class*/
+	public com.taulukko.commons.util.lang.EMilisecond dif(EDate date)
+	{
+		long lThisTime = calendar.getTimeInMillis();
+		long lParamDate = date.toJavaCalendar().getTimeInMillis();
+		return new com.taulukko.commons.util.lang.EMilisecond(lThisTime - lParamDate);
 	}
 
 	public Date toJavaDate()
 	{
-		return m_calendar.getTime();
+		return calendar.getTime();
 	}
 
 	public Calendar toJavaCalendar()
 	{
 		Calendar ret = Calendar.getInstance();
-		ret.setTime(m_calendar.getTime());
+		ret.setTime(calendar.getTime());
 		return ret;
 	}
 

@@ -1,16 +1,25 @@
-package com.taulukko.commons.util.groovy;
+package com.taulukko.commons.util;
 
-class LooperUntil {
-	private Closure code
+import java.util.Optional;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
-	static LooperUntil loop( Closure code ) {
-		new LooperUntil(code:code)
+public class LooperUntil<T> {
+	private  Consumer<Optional<T>> code;
+
+	private LooperUntil(Consumer<Optional<T>> code) {
+		this.code = code;
+
 	}
 
-	void until( Closure test ) {
-		code()
-		while (!test()) {
-			code()
+	public static <T>LooperUntil<T> loop( Consumer<Optional<T>> code ) {
+		return new LooperUntil<>( code);
+	}
+
+	public void until( BooleanSupplier test,Optional<T> param) {
+		code.accept(param);
+		while (!test.getAsBoolean()) {
+			code.accept(param);
 		}
 	}
 }
