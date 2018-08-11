@@ -1,8 +1,8 @@
 #ignorar arquivos e diretórios:
 
 #build files
-system/build/*
-system/.*
+system/build/* 
+target
  
 # Compiled source #
 ###################
