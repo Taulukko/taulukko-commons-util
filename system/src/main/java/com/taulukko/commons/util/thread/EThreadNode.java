@@ -27,7 +27,7 @@ public class EThreadNode extends EBase implements IERunnable {
 
 	private Thread m_thread = null;
 
-	private EDataMap<String, IEScriptActionThread> m_threads = new EDataMap<String, IEScriptActionThread>();
+	private EDataMap<String, IEScriptActionThread> m_threads = new EDataMap<>();
 
 	private boolean m_bIsAlive = true;
 

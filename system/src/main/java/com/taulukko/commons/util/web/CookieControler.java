@@ -11,9 +11,9 @@ import com.taulukko.commons.util.lang.EDate;
 
 public class CookieControler
 {
-	private static HashMap<String, ArrayList<Cookie>> _sessions = new HashMap<String, ArrayList<Cookie>>();
+	private static HashMap<String, ArrayList<Cookie>> _sessions = new HashMap<>();
 
-	private static HashMap<String, Boolean> _ends = new HashMap<String, Boolean>();
+	private static HashMap<String, Boolean> _ends = new HashMap<>();
 
 	public static ArrayList<Cookie> getCookies(HttpServletRequest request)
 	{
@@ -31,7 +31,7 @@ public class CookieControler
 		}
 		else
 		{
-			cookies = new ArrayList<Cookie>();
+			cookies = new ArrayList<>();
 			_sessions.put(sid,cookies);
 		}
 		return cookies;

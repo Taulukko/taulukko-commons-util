@@ -81,7 +81,7 @@ public class EStackList<V> extends EAbstractList<V>
 
 	public void add(V obj)
 	{
-		ENode<V> top = new ENode<V>();
+		ENode<V> top = new ENode<>();
 		//seta a informacao para a pilha
 		top.setInfo(obj);
 		//seta o mapeamento
@@ -99,7 +99,7 @@ public class EStackList<V> extends EAbstractList<V>
 
 	public Object clone()
 	{
-		EStackList<V> ret = new EStackList<V>();
+		EStackList<V> ret = new EStackList<>();
 
 		ENode<V> node = m_topNode;
 
@@ -116,7 +116,7 @@ public class EStackList<V> extends EAbstractList<V>
 
 	public Enumeration<V> getElements()
 	{
-		return new EVisitorStackList<V>(this);
+		return new EVisitorStackList<>(this);
 	}
 
 	public EIterator<V> getItens()
@@ -126,7 +126,7 @@ public class EStackList<V> extends EAbstractList<V>
 
 	public IEList<V> revert()
 	{
-		EStackList<V> ret = new EStackList<V>();
+		EStackList<V> ret = new EStackList<>();
 
 		ENode<V> node = m_topNode;
 
@@ -157,7 +157,7 @@ public class EStackList<V> extends EAbstractList<V>
 		try		
 			{
 
-			EStackList<V> lista = new EStackList<V>();
+			EStackList<V> lista = new EStackList<>();
 			long lTamanhoOriginal = this.getLength();
 
 			//inverte a pilha 
@@ -201,7 +201,7 @@ public class EStackList<V> extends EAbstractList<V>
 	public EVector<V> toVector()
 	{
 		//cria a variavel de retorno
-		EVector<V> ret = new EVector<V>(this.getLength());
+		EVector<V> ret = new EVector<>(this.getLength());
 		
 		//captura o enumerador
 		Enumeration<V> varEnum = this.getElements();

@@ -18,7 +18,7 @@ public class PoolConnector
 
 	private static int CLOSING = 4;
 
-	protected CopyOnWriteArrayList<PseudoConnection> connections = new CopyOnWriteArrayList<PseudoConnection>();
+	protected CopyOnWriteArrayList<PseudoConnection> connections = new CopyOnWriteArrayList<>();
 
 	protected Logger logger = null;
 

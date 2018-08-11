@@ -86,7 +86,7 @@ public class EVector<T>
     public EVector<T> clone() throws CloneNotSupportedException
     {
         //cria o retorno
-        EVector<T> ret = new EVector<T>(this.getLength());
+        EVector<T> ret = new EVector<>(this.getLength());
         Enumeration varEnum = this.getElements();
         //Para cada item em this , ele copia        
         for (int iCont = 0; varEnum.hasMoreElements(); iCont++)
@@ -99,7 +99,7 @@ public class EVector<T>
     public EVector<T> revert()
     {
         //cria o retorno
-        EVector<T> ret = new EVector<T>(this.getLength());
+        EVector<T> ret = new EVector<>(this.getLength());
         for (int iCont = this.getLength() - 1; iCont >= 0; iCont--)
         {
             ret.set(iCont, this.get(this.getLength() - (iCont + 1)));

@@ -22,7 +22,7 @@ public class EThreadControl extends EBase
      */
     private static final long serialVersionUID = 1L;
     
-    private EDataMap<Integer,EThreadNode> m_threads = new EDataMap<Integer,EThreadNode>();
+    private EDataMap<Integer,EThreadNode> m_threads = new EDataMap<>();
     
     private static EThreadControl m_threadControl;
     

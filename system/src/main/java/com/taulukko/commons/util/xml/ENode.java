@@ -24,7 +24,7 @@ import com.taulukko.commons.util.struct.EVector;
  */
 public class ENode extends EBase implements org.w3c.dom.Node
 {
-    private EVector<Node> m_childs = new EVector<Node>(0);
+    private EVector<Node> m_childs = new EVector<>(0);
 
     private String m_sValue = "";
 

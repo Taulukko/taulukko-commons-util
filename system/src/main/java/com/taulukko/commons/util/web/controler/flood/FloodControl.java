@@ -11,7 +11,7 @@ public class FloodControl
 
 	private static FloodControl _me = null;
 
-	private Map<String, FloodBean> floodInformation = new ConcurrentHashMap<String, FloodBean>();
+	private Map<String, FloodBean> floodInformation = new ConcurrentHashMap<>();
 
 	private long _lastForgot = System.currentTimeMillis();
 
@@ -47,7 +47,7 @@ public class FloodControl
 				.currentTimeMillis())
 		{
 			// hora de esquecer
-			floodInformation = new HashMap<String, FloodBean>();
+			floodInformation = new HashMap<>();
 			_lastForgot = System.currentTimeMillis();
 		}
 	}

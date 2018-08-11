@@ -15,7 +15,7 @@ package com.taulukko.commons.util.struct;
 public class EOrderList<T>
 {
 
-	EVector<EProperty<T>> m_obj = new EVector<EProperty<T>>(10);
+	EVector<EProperty<T>> m_obj = new EVector<>(10);
 
 	int m_iIndex = 0;
 
@@ -29,13 +29,13 @@ public class EOrderList<T>
 		if (iEnd == -1)
 		{
 			// 1-n�o existem itens cadastrados
-			m_obj.set(m_iIndex, new EProperty<T>("" + iKey, obj));
+			m_obj.set(m_iIndex, new EProperty<>("" + iKey, obj));
 			m_iIndex++;
 		}
 
 		if (iStart >= iEnd)
 		{
-			organizerInsert(new EProperty<T>("" + iKey, obj), iStart);
+			organizerInsert(new EProperty<>("" + iKey, obj), iStart);
 			return;
 		}
 

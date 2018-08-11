@@ -138,7 +138,7 @@ public class EWebTools
 
 	public static Map<String, String> parseQueryStringToMap(String queryString)
 	{
-		Map<String, String> ret = new HashMap<String, String>();
+		Map<String, String> ret = new HashMap<>();
 
 		boolean containParameters = queryString.contains("?");
 		if (containParameters)
