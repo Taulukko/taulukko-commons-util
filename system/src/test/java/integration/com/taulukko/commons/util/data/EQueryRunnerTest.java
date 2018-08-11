@@ -23,14 +23,14 @@ public class EQueryRunnerTest {
 
 	@Test
 	public void query() throws TaulukkoException {
-		int total = contaCmps(6);
-		System.out.println("Foram encontradas " + total + " campanhas.");
+		int total = contaMacros(6);
+		System.out.println("Foram encontradas " + total + " macros.");
 	}
 
-	private int contaCmps(int gmid) throws TaulukkoException {
+	private int contaMacros(int userid) throws TaulukkoException {
 		EQueryRunner runner = new EQueryRunner(datasource);
-		String sql = "SELECT count(*) as total FROM cmps WHERE gmid = ?";
-		Command command = new Command(sql, gmid);
+		String sql = "SELECT count(*) as total FROM macros where userid = ? ";
+		Command command = new Command(sql,userid);
 		SingleObjectHandler<Long> handler = new SingleObjectHandler<>("total");
 		Long total = runner.query(command, handler);
 		Assert.assertNotNull(total);
@@ -40,19 +40,19 @@ public class EQueryRunnerTest {
 
 	@Test
 	public void update() throws TaulukkoException {
-		int totalAntigo = contaCmps(6);
+		int totalAntigo = contaMacros(6);
 
 		EQueryRunner runner = new EQueryRunner(datasource);
-		String sql = "SELECT id FROM cmps WHERE gmid <> ? limit 1";
-		Command command = new Command(sql, 6);
-		SingleObjectHandler<Integer> handler = new SingleObjectHandler<>("id");
+		String sql = "SELECT cmpId FROM macros where userid=  ? limit 1";
+		Command command = new Command(sql,6);
+		SingleObjectHandler<Integer> handler = new SingleObjectHandler<>("cmpId");
 		Integer cmpid = runner.query(command, handler);
 
-		sql = "UPDATE cmps SET gmid = ? WHERE id = ?";
-		command = new Command(sql, 6, cmpid);
+		sql = "UPDATE macros SET userid = ?, cmpId = ? where userid <> ? and cmpId <> ?  limit 1";
+		command = new Command(sql, 6,cmpid,6, cmpid);
 		runner.update(command);
 
-		int totalNovo = contaCmps(6);
+		int totalNovo = contaMacros(6);
 		Assert.assertEquals(totalNovo, totalAntigo + 1);
 		System.out.println("Foram encontradas " + totalNovo + " campanhas.");
 

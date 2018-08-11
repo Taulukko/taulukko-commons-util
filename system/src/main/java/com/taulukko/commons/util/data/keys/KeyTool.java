@@ -11,7 +11,12 @@ public class KeyTool {
 
 	protected static int RADIX_BASE = 36;
  
-	public static String VERSION = "10"; 
+	/**
+	 * Version 1.0 - start version
+	 * Version 1.1 - fix nanotime
+	 * */
+	
+	public static String VERSION = "11"; 
 
 	public static Key stringToKey(String strKey) {
 		Key key = new Key();
@@ -59,7 +64,7 @@ public class KeyTool {
 				+ String.valueOf(EDiceKit.rool(1, 1000000, -1)));
 		strKey.append(random.right(6).toString());
 
-		EString nanoTime = new EString("00000"
+		EString nanoTime = new EString("000000000000000000000"
 				+ String.valueOf(System.nanoTime()));
 		strKey.append(nanoTime.right(21).toString());
 

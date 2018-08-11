@@ -1,7 +1,5 @@
 package com.taulukko.commons.util.config;
 
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,16 +17,12 @@ public class ConfigBaseTest {
 	@BeforeClass
 	public static void init() throws TaulukkoException {
 
-		Reloadable reloadable = new Reloadable() {
-			public void reload(@SuppressWarnings("rawtypes") ConfigBase configbase, Map<String, String> properties) {
-			}
-		};
-
 		ConfigBuilder<TestConfig> configBuilder = new ConfigBuilder<TestConfig>() {
 
 			public TestConfig createNewConfig() {
 
-				return new TestConfig(reloadable);
+				return new TestConfig((a, b) -> {
+				});
 			}
 		};
 
@@ -64,7 +58,7 @@ public class ConfigBaseTest {
 
 	static class TestConfig extends ConfigBase<TestConfig> {
 
-		public TestConfig(Reloadable reloadable) {
+		public TestConfig(Reloadable<TestConfig> reloadable) {
 			super(reloadable, TestConfig.class);
 		}
 	}

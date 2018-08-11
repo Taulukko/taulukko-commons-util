@@ -68,19 +68,30 @@ public class EFile extends EAbstractFile {
 		case RESOURCE: {
 			// convert resource to url
 			ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-			path = EFile.getClassLoaderPath() + path;
-			url = classLoader.getResource(path);
-			if (url == null) {
+			String newpath = EFile.getClassLoaderPath() + path;
+
+			url = classLoader.getResource(newpath);
+
+			boolean resourceNotFound = url == null;
+			boolean j2ee = resourceNotFound && new EFile(newpath).exists();
+
+			if (resourceNotFound && !j2ee) {
+
 				throw new RuntimeException("File [" + path + "] not found");
 			}
+
+			if (j2ee) {
+				return loadFile(newpath, SourceFileType.PATH);
+			}
+			return loadFile(newpath, SourceFileType.URL);
 		}
-		case URL: {
-			// convert url to path
+		case URL: { 
 			try {
 				if (url == null) {
 					url = new URL(path);
 				}
-				path = url.getFile();
+				String newpath = url.getFile();
+				return loadFile(newpath, SourceFileType.PATH);
 			} catch (MalformedURLException e) {
 				throw new RuntimeErrorException(new Error(e));
 			}
@@ -107,7 +118,7 @@ public class EFile extends EAbstractFile {
 		super(file);
 	}
 
-	public static String getWorkPath() { 
+	public static String getWorkPath() {
 		return new File(".").getAbsolutePath();
 	}
 

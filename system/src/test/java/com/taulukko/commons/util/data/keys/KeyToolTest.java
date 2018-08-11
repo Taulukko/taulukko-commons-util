@@ -7,11 +7,9 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.taulukko.commons.util.data.keys.Key;
-import com.taulukko.commons.util.data.keys.KeyTool;
-
 public class KeyToolTest {
 
+	 
 
 	/**
 	 * Version (formato DD 2) eg 10 para versão 1.0 CLUSTER-ID (formato DDD 3) +
@@ -38,6 +36,7 @@ public class KeyToolTest {
 	@Test
 	public void goAndBack() throws Exception {
 		
+		
 		long startNanos = System.nanoTime();
 		
 		String strKeyBase36 = KeyTool.build(1);
@@ -50,8 +49,9 @@ public class KeyToolTest {
 		Key key = KeyTool.stringToKey(strKeyBase36);
 		Assert.assertNotNull(key); 
 		Assert.assertEquals(1, key.getClusterId());
-		Assert.assertEquals(0, key.getMinorVersion());
-		Assert.assertEquals(1, key.getMajorVersion());
+
+		Assert.assertTrue(  key.getMajorVersion()>=1);
+		Assert.assertTrue(  key.getMinorVersion()>=1);
 		
 		long endNanos = System.nanoTime();
 		
@@ -66,8 +66,8 @@ public class KeyToolTest {
 		Assert.assertEquals(34, strUUID.length());
 		Key uuid = KeyTool.stringToKey(strUUID);
 		Assert.assertEquals(1, uuid.getClusterId());
-		Assert.assertEquals(1, uuid.getMajorVersion());
-		Assert.assertEquals(0, uuid.getMinorVersion());
+		Assert.assertTrue(  uuid.getMajorVersion()>=1);
+		Assert.assertTrue(  uuid.getMinorVersion()>=1);
 		Assert.assertEquals(Thread.currentThread().getId(), uuid.getThreadId());
 	}
 
