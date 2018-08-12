@@ -64,20 +64,5 @@ public class MeasureTimer {
 		return DurationFormatUtils.formatDuration(duration / EDate.TP_MILISECOND_IN_NS, "HH:mm:ss.SSSS.")
 				+   formatter.format( nanos);
 
-	}
-
-	/**
-	 * Testing this class.
-	 * 
-	 * @param args
-	 *            Not used.
-	 */
-	public static void main(String[] args) {
-		MeasureTimer timer = new MeasureTimer();
-		for (int i = 0; i < 100000000; i++) {
-			double b = 998.43678;
-			double c = Math.sqrt(b);
-		}
-		System.out.println(timer);
-	}
+	} 
 }
