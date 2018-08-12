@@ -14,8 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
 
-import com.taulukko.commons.util.web.util.EWebTools;
-
 /**
  * @author Edson
  * 
@@ -31,8 +29,7 @@ public abstract class RequestBase
 	private int _method;
 
 	private HashMap<String, Object> _parameters;
-
-	private EWebTools _webTools = null;
+ 
 	
 
 	/**
@@ -44,8 +41,7 @@ public abstract class RequestBase
 		_parameters = parameters;
 		_request = request;
 		_response = response;
-		_method = method;
-		_webTools = new EWebTools(_request);
+		_method = method; 
 	}
 
 	public abstract void run();
@@ -139,9 +135,5 @@ public abstract class RequestBase
 	{
 		_parameters = parameters;
 	}
-
-	public EWebTools getWebTools()
-	{
-		return _webTools;
-	}
+ 
 }
