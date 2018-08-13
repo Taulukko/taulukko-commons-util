@@ -16,5 +16,7 @@ To use Tauluko Maven Mirror, add in your settings.xml
   
 Compatibility
 =====================
+
 taulukko.commons.util 2.X = > Java 10 or more
+
 taulukko.commons.util 1.X = > Java 0.8 or more
