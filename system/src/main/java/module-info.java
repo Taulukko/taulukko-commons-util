@@ -33,9 +33,18 @@ module taulukko.commons.util {
 	exports com.taulukko.commons.util.config.serialization; 
 	
  
-	requires org.apache.commons.codec; 
+	requires org.apache.commons.codec;
 	requires java.desktop; 
 	requires java.management;
 	requires java.naming;
-	requires java.sql; 
+	requires java.sql;
+	requires javax.servlet.api;
+	requires commons.dbutils;
+	requires commons.validator;
+	requires org.apache.commons.io;
+	requires log4j;
+	requires log4j.api;
+	requires commons.fileupload;
+	requires org.apache.commons.lang3;
+	requires junit;
 }
