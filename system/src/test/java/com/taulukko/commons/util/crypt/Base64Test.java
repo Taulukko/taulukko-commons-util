@@ -10,6 +10,17 @@ import org.junit.Test;
  
  
 public class Base64Test {
+	
+	@Test
+	//detected : 04-2019
+	public void falseErorBase64Invalid() throws IOException
+	{  
+		String encoded ="eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiMTAyNTUyMDgxODczMi1kaTh1aXYyaWJ2bHRrYXUxZGh1cG8zNmZwYWxjajVxZC5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImF1ZCI6IjEwMjU1MjA4MTg3MzItZGk4dWl2Mmlidmx0a2F1MWRodXBvMzZmcGFsY2o1cWQuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTI0NTQ4OTgyNDQxNTQzODYxMzEiLCJlbWFpbCI6ImdhbmRicmFuY29AZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF0X2hhc2giOiJJRzFpQ25CMGtEX3pKcUowbU41OEF3IiwiaWF0IjoxNTU0MzIwNjYwLCJleHAiOjE1NTQzMjQyNjB9";
+		String decodedExpected = "{\"iss\":\"accounts.google.com\",\"azp\":\"1025520818732-di8uiv2ibvltkau1dhupo36fpalcj5qd.apps.googleusercontent.com\",\"aud\":\"1025520818732-di8uiv2ibvltkau1dhupo36fpalcj5qd.apps.googleusercontent.com\",\"sub\":\"112454898244154386131\",\"email\":\"gandbranco@gmail.com\",\"email_verified\":true,\"at_hash\":\"IG1iCnB0kD_zJqJ0mN58Aw\",\"iat\":1554320660,\"exp\":1554324260}"; 
+		String decoded = new String( Base64.decode(encoded,true));
+		Assert.assertEquals(decodedExpected, decoded);
+	}
+	
 	@Test
 	public void removeSymbols() throws IOException
 	{  
