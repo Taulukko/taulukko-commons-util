@@ -14,10 +14,10 @@ import javax.crypto.Cipher;
 import com.taulukko.commons.util.lang.EString;
 
 public class PasswordGen {
-	
+
 	public static final String VERSION_2_0_0 = "0200";
 	public static final String VERSION_1_0_0 = "0100";
-	
+
 	private static final String SHA = "SHA";
 
 	private static final String MD5 = "MD5";
@@ -28,33 +28,25 @@ public class PasswordGen {
 
 	public static void main(String argsv[]) {
 
-		PasswordGen genpass2 = new PasswordGen(VERSION_2_0_0,"FLUX CAPACITOR");
-		PasswordGen genpass = new PasswordGen("0100","FLUX CAPACITOR");
+		PasswordGen genpass2 = new PasswordGen(VERSION_2_0_0, "FLUX CAPACITOR");
+		PasswordGen genpass = new PasswordGen("0100", "FLUX CAPACITOR");
 
-		System.out.println("Senha default(aoors$dqjq55q)"
-				+ genpass2.subCrypt("aoors$dqjq55q"));
-		System.out.println("Senha MD5(aoors$dqjq55q)"
-				+ genpass2.cryptMD5("aoors$dqjq55q"));
-		System.out.println("Senha SHA(aoors$dqjq55q)"
-				+ genpass2.cryptSHA("aoors$dqjq55q"));
+		System.out.println("Senha default(aoors$dqjq55q)" + genpass2.subCrypt("aoors$dqjq55q"));
+		System.out.println("Senha MD5(aoors$dqjq55q)" + genpass2.cryptMD5("aoors$dqjq55q"));
+		System.out.println("Senha SHA(aoors$dqjq55q)" + genpass2.cryptSHA("aoors$dqjq55q"));
 
-		System.out.println("Senha crypt(aoors$dqjq55q)"
-				+ genpass2.subCrypt("aoors$dqjq55q"));
+		System.out.println("Senha crypt(aoors$dqjq55q)" + genpass2.subCrypt("aoors$dqjq55q"));
 
 		try {
-			System.out.println("Senha crypt(aoors$dqjq55q,0100)"
-					+ genpass.crypt("aoors$dqjq55q"));
-			System.out.println("Senha crypt(aoors$dqjq55q,0200)"
-					+ genpass2.crypt("aoors$dqjq55q"));
+			System.out.println("Senha crypt(aoors$dqjq55q,0100)" + genpass.crypt("aoors$dqjq55q"));
+			System.out.println("Senha crypt(aoors$dqjq55q,0200)" + genpass2.crypt("aoors$dqjq55q"));
 
 			// boiada
 			String encrypted = "4a4a7a6a54596f6b71324e634a776e76744446646e6b5174706453696679596f4177362f63624158356f616c596d574c6c65345341676d4230647568507947445979324565613030765767343453783841537977514348434d5375362b6d677461566b514f6e674a624638344c7530527147323169497730427645595679614530527a5a64714672787454503932324a426d334b756d536b477350547a72457137694b6f2f4432613935303d";
 			String privateKey64 = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAJBQClByqvwaHTxV0RxLOSVDdbwq1ocb6xJCS39xNqgAfjPavU02GBr5cM9dCT6l/IfMY+pv0c/ttHaajTrlB0y2wT6oQY9pukWCdkAH1wyOhZAssJNnnRoOEe8L8td/txWAYp+/PRlUA8LjbyvQu4BA4ay1eBk87d+Wwkt4QaozAgMBAAECgYBjfjtOMXA+tMZZNZUgm5//V94Q57vVlGLhyMECUQxskUJw/6qpU9UUq8qhvDPGdGuBOGHeXE9bujdD2dPqucHokF/kSlBMULKiw9bigQOvVDGbvyb+CiRcPzpeVxlFlzAnjnCol1dedTEvpyuyD9mLxpADMz7Wt7Pgshsug2py+QJBANTnGtEZkmQu0BioEPAnuP4ksLj8INZwC9UheTTuGmk+LCgxtZeOt56Hezz4X/Y/nY30SFXG2lx6T0qgpe8Nj90CQQCthoIhXTiajoyxC0nGCIQpH9W99/dimESoE7uPqj7WuL0dD6IgBWvr2HspgHX+6uSYrEgQ1bpsVQioNqbumYlPAkByir+fvc1HvvPQQCOUwRpDCQRXEbatB+0lxnOKaYumEX/6Q/w5xNu/G47PF6WxOzqN095S38A9PsSIFvQPL9G1AkB+lg5eSoQdc/o8uXBjEBlhasDhaYBFo7EKMAL2xgo7V99V0O7Dj1DwZydJ2lW51h9XJO8ZoODzYIEFPYE/tC/PAkABUlklYjLDjD4Z5RBI6sbQyiDxzAVkAiKMHFwN89pse0xXKK7bUfbLhvRX9qMMyFMAujAmjG1iHCQq0YTIuK5k";
 
-			System.out
-					.println("Senha decript(hexbase64cryptedPassword,privateKey64)"
-							+ genpass2
-									.decryptHexFromRSA(encrypted, privateKey64));
+			System.out.println("Senha decript(hexbase64cryptedPassword,privateKey64)"
+					+ genpass2.decryptHexFromRSA(encrypted, privateKey64));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -71,8 +63,7 @@ public class PasswordGen {
 		this.salt = salt;
 	}
 
-	public String decryptHexFromRSA(String passwordEncryptedHex64,
-			String privateKey64) throws Exception {
+	public String decryptHexFromRSA(String passwordEncryptedHex64, String privateKey64) throws Exception {
 		PrivateKey privateKey = convertToPrivateKey(privateKey64);
 
 		String passwordEncrypted64 = hexToString(passwordEncryptedHex64);
@@ -108,8 +99,7 @@ public class PasswordGen {
 	}
 
 	private PrivateKey convertToPrivateKey(String base64Key) throws Exception {
-		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(
-				Base64.decode(base64Key));
+		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.decode(base64Key));
 		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 		PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
 		return privateKey;
@@ -138,11 +128,22 @@ public class PasswordGen {
 		}
 
 	}
+	 
+
+	public boolean equals(String password, String passwordEncrypt) throws Exception {
+		if (version.equals(VERSION_1_0_0)) {
+			return subCrypt(password).equals(passwordEncrypt);
+		} else if (version.equals(VERSION_2_0_0)) {
+			return (VERSION_2_0_0 + "==" + subCrypt(password + salt)).equals(passwordEncrypt);
+		} else {
+			throw new Exception("Encrypt version not suported");
+		}
+
+	}
 
 	private String subCrypt(String sPassword) {
 		try {
-
-			// cria a conta no l2-login
+ 
 			MessageDigest md = MessageDigest.getInstance(MD5);
 			byte[] raw = sPassword.getBytes("UTF-8");
 			byte[] hash = md.digest(raw);
@@ -158,12 +159,10 @@ public class PasswordGen {
 
 	private String cryptBase(String sPassword, String sMethod) {
 		try {
-
-			// cria a conta no l2-login
+ 
 			MessageDigest md = MessageDigest.getInstance(sMethod);
 			byte[] raw = sPassword.getBytes("UTF-8");
-			byte[] hash = md.digest(raw);
-			// sPassword = EString.toHexString(hash).toString();
+			byte[] hash = md.digest(raw); 
 			sPassword = Base64.encode(hash, 0);
 			return sPassword;
 		} catch (Exception e) {
@@ -192,9 +191,7 @@ public class PasswordGen {
 		String valid = "abcdefghijklmnopqrstuvxzwyABCDEFGHIJKLMNOPQRSTUVXYZW0123456789";
 		for (int cont = 0; cont < pass.length(); cont++) {
 			if (valid.indexOf(String.valueOf(pass.charAt(cont))) < 0) {
-				pass = new EString(pass).replace(
-						new EString(String.valueOf(pass.charAt(cont))), empty)
-						.toString();
+				pass = new EString(pass).replace(new EString(String.valueOf(pass.charAt(cont))), empty).toString();
 				cont--;
 			}
 		}

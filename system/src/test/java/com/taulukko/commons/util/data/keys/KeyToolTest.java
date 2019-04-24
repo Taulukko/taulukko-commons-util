@@ -6,14 +6,9 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.taulukko.commons.util.data.keys.Key;
-import com.taulukko.commons.util.data.keys.KeyTool;
-import com.taulukko.commons.util.game.EDiceKit;
-import com.taulukko.commons.util.lang.EString;
-
-public class KeyToolTest {
-
+ 
+public class KeyToolTest { 
+ 
 	/**
 	 * Version (formato DD 2) eg 10 para versão 1.0 CLUSTER-ID (formato DDD 3) +
 	 * Thread Id (formato DDD DDD DDD DDD DDD DDD DDD 21) + Random Id (formato
@@ -37,8 +32,7 @@ public class KeyToolTest {
 	}
 
 	@Test
-	public void goAndBack() throws Exception {
-
+	public void goAndBack() throws Exception { 
 		long startNanos = System.nanoTime();
 
 		String strKeyBase36 = KeyTool.build(1);
@@ -50,10 +44,12 @@ public class KeyToolTest {
 
 		Key key = KeyTool.stringToKey(strKeyBase36);
 		Assert.assertNotNull(key);
-		Assert.assertEquals(1, key.getClusterId());
+		Assert.assertEquals(1, key.getClusterId()); 
 		Assert.assertEquals(1, key.getMinorVersion());
-		Assert.assertEquals(1, key.getMajorVersion());
-
+		Assert.assertEquals(1, key.getMajorVersion()) ;
+		Assert.assertTrue(  key.getMajorVersion()>=1);
+		Assert.assertTrue(  key.getMinorVersion()>=1);
+		 
 		long endNanos = System.nanoTime();
 
 		Assert.assertTrue(key.getNanos() > startNanos);
@@ -66,9 +62,11 @@ public class KeyToolTest {
 		String strUUID = KeyTool.build(1);
 		Assert.assertTrue(strUUID.length()<35);
 		Key uuid = KeyTool.stringToKey(strUUID);
-		Assert.assertEquals(1, uuid.getClusterId());
+		Assert.assertEquals(1, uuid.getClusterId()); 
 		Assert.assertEquals(1, uuid.getMajorVersion());
-		Assert.assertEquals(1, uuid.getMinorVersion());
+		Assert.assertEquals(1, uuid.getMinorVersion()); 
+		Assert.assertTrue(  uuid.getMajorVersion()>=1);
+		Assert.assertTrue(  uuid.getMinorVersion()>=1); 
 		Assert.assertEquals(Thread.currentThread().getId(), uuid.getThreadId());
 	}
 

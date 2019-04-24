@@ -44,7 +44,7 @@ public class EDataMap<K, V> extends HashMap<K, V>
     
     public EVector<V> toVector()
     {
-        EVector<V> ret = new EVector<V>(this.getLength());
+        EVector<V> ret = new EVector<>(this.getLength());
         Object[] values = this.values().toArray();
         for(int iCont=0;iCont<values.length;iCont++)
         {

@@ -1,10 +1,9 @@
 package com.taulukko.commons.util.web;
+ 
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-
-import com.taulukko.commons.util.web.HtmlFilter;
 
 public class HtmlFilterTest
 {

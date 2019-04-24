@@ -10,7 +10,7 @@ public abstract class FilterCharacters
 	{
 		byte [] invalid = this.getInvalidCharacters();
 		
-		ArrayList<Byte> newContent = new ArrayList<Byte>();
+		ArrayList<Byte> newContent = new ArrayList<>();
 		
 		for(int contContent =0; contContent < content.length;contContent++)
 		{

@@ -34,7 +34,7 @@ public class EDataMapImage extends EBase
 
     private static EDataMapImage m_loader = null;
 
-    private static EDataMap<String, Image> m_dataMap = new EDataMap<String, Image>();
+    private static EDataMap<String, Image> m_dataMap = new EDataMap<>();
 
     private static int m_iCheckPoint = 0;
 

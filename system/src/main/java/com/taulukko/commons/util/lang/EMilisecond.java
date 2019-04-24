@@ -1,5 +1,7 @@
 package com.taulukko.commons.util.lang;
 
+@Deprecated
+/*Use com.taulukko.commons.util.lang.datetime*/
 public class EMilisecond
 {
 	private long m_lMilis = 0;

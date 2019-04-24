@@ -18,7 +18,7 @@ public class ETreeNode<T> extends EBase
      * Comment for <code>serialVersionUID</code>
      */
     private static final long serialVersionUID = 1L;
-    private HashMap<String,ETreeNode<T>> m_Nodes = new HashMap<String,ETreeNode<T>>();
+    private HashMap<String,ETreeNode<T>> m_Nodes = new HashMap<>();
 	private String m_sName;
 	private T m_value;
 	private ETreeNode<T> m_parent;
@@ -59,7 +59,7 @@ public class ETreeNode<T> extends EBase
 			if (node == null)
 			{
 				//ela ainda nao existia, cria entao a propriedade
-				node = new ETreeNode<T>(sDirs[0]);
+				node = new ETreeNode<>(sDirs[0]);
 				this.setNode(node);
 			}
 
@@ -164,7 +164,7 @@ public class ETreeNode<T> extends EBase
 	 */
 	public EVector<ETreeNode<T>> getNodes()
 	{
-		EVector<ETreeNode<T>> ret = new EVector<ETreeNode<T>>(this.getLength());
+		EVector<ETreeNode<T>> ret = new EVector<>(this.getLength());
 
 		Iterator<ETreeNode<T>> iterator = m_Nodes.values().iterator();
 

@@ -23,8 +23,8 @@ public class ApacheLogParser
 			int wait = 10000;
 			int waitnewline = 100;
 
-			HashMap<String, Long> founds = new HashMap<String, Long>();
-			HashMap<String, Long> notFounds = new HashMap<String, Long>();
+			HashMap<String, Long> founds = new HashMap<>();
+			HashMap<String, Long> notFounds = new HashMap<>();
 
 			while (line != null)
 			{

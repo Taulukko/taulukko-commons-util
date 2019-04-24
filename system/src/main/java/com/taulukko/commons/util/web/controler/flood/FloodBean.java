@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FloodBean
 {
 
-	private Map<String, Integer> logins = new ConcurrentHashMap<String, Integer>();
+	private Map<String, Integer> logins = new ConcurrentHashMap<>();
 
 	private String address = null;
 

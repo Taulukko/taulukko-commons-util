@@ -1,11 +1,14 @@
 package com.taulukko.commons.util.data;
 
-import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 
+import com.taulukko.commons.TaulukkoException;
+
+/*Utilizar o pool da apache commons*/
+@Deprecated
 public class PoolConnector
 {
 
@@ -15,7 +18,7 @@ public class PoolConnector
 
 	private static int CLOSING = 4;
 
-	protected CopyOnWriteArrayList<PseudoConnection> connections = new CopyOnWriteArrayList<PseudoConnection>();
+	protected CopyOnWriteArrayList<PseudoConnection> connections = new CopyOnWriteArrayList<>();
 
 	protected Logger logger = null;
 
@@ -80,12 +83,12 @@ public class PoolConnector
 
 	}
 
-	public IEConector getConnection() throws SQLException
+	public IEConector getConnection() throws TaulukkoException
 	{
 
 		if (closing)
 		{
-			throw new SQLException("Pool closed");
+			throw new TaulukkoException("Pool closed");
 		}
 
 		double waitTime = 0;
@@ -98,7 +101,7 @@ public class PoolConnector
 				Thread.sleep(100);
 				if (waitTime > maxWaitTimeout)
 				{
-					throw new SQLException(
+					throw new TaulukkoException(
 							"Timeout, no connection available. Try increasing the property maxActive.");
 				}
 			}
@@ -140,11 +143,11 @@ public class PoolConnector
 			connections.add(conector);
 			return conector;
 		}
-		catch (SQLException e)
+		catch (TaulukkoException e)
 		{
 			error(e);
 			closeAllConnections();
-			throw new SQLException("Connection cannot be created by Pool");
+			throw new TaulukkoException("Connection cannot be created by Pool");
 		}
 	}
 
@@ -378,7 +381,7 @@ public class PoolConnector
 			trueConnection = connector;
 		}
 
-		public void beginTrans() throws SQLException
+		public void beginTrans() throws TaulukkoException
 		{
 			debug("beginTrans");
 			// trueConnection.beginTrans();
@@ -409,7 +412,7 @@ public class PoolConnector
 						trueConnection.rollbackTrans();
 					}
 				}
-				catch (SQLException e)
+				catch (TaulukkoException e)
 				{
 					error(e);
 				}
@@ -417,13 +420,13 @@ public class PoolConnector
 			}
 		}
 
-		public void commitTrans() throws SQLException
+		public void commitTrans() throws TaulukkoException
 		{
 			debug("commitTrans");
 			// trueConnection.commitTrans();
 		}
 
-		public void execute(String arg0) throws SQLException
+		public void execute(String arg0) throws TaulukkoException
 		{
 			debug("execute[" + arg0 + "]");
 			this.live = System.currentTimeMillis();
@@ -431,7 +434,7 @@ public class PoolConnector
 			trueConnection.execute(arg0);
 		}
 
-		public boolean exist(String arg0) throws SQLException
+		public boolean exist(String arg0) throws TaulukkoException
 		{
 			debug("exist");
 			this.live = System.currentTimeMillis();
@@ -479,7 +482,7 @@ public class PoolConnector
 			return -1;
 		}
 
-		public ERecordSet getRecordSet(String arg0) throws SQLException
+		public ERecordSet getRecordSet(String arg0) throws TaulukkoException
 		{
 			debug("getRecordSet[" + arg0 + "]");
 			this.live = System.currentTimeMillis();
@@ -493,12 +496,12 @@ public class PoolConnector
 			return -1;
 		}
 
-		public void open() throws SQLException
+		public void open() throws TaulukkoException
 		{
 			stackTraceInfo("Connection call open, pool not use open");
 		}
 
-		public void rollbackTrans() throws SQLException
+		public void rollbackTrans() throws TaulukkoException
 		{
 			debug("rollbackTrans");
 			trueConnection.rollbackTrans();
@@ -531,32 +534,32 @@ public class PoolConnector
 			return -1;
 		}
 
-		public Savepoint createSavePoint() throws SQLException
+		public Savepoint createSavePoint() throws TaulukkoException
 		{
 			debug("createSavePoint");
 			return trueConnection.createSavePoint();
 		}
 
-		public void removeSavePoint(Savepoint save) throws SQLException
+		public void removeSavePoint(Savepoint save) throws TaulukkoException
 		{
 			debug("removeSavePoint");
 			trueConnection.removeSavePoint(save);
 
 		}
 
-		public void rollbackTrans(Savepoint save) throws SQLException
+		public void rollbackTrans(Savepoint save) throws TaulukkoException
 		{
 			debug("rollback(Savepoint save) ");
 			trueConnection.rollbackTrans(save);
 		}
 
-		public void commitTrans(Savepoint save) throws SQLException
+		public void commitTrans(Savepoint save) throws TaulukkoException
 		{
 			debug("commit(Savepoint save) ");
 			trueConnection.commitTrans(save);
 		}
 
-		public boolean inTransaction() throws SQLException
+		public boolean inTransaction() throws TaulukkoException
 		{
 			debug("inTransaction");
 			return trueConnection.inTransaction();

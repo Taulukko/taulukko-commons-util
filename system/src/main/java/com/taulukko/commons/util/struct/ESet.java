@@ -18,7 +18,7 @@ import java.util.Enumeration;
  */
 public class ESet<O>
 {
-	private ArrayList<O> _vSet = new ArrayList<O>();
+	private ArrayList<O> _vSet = new ArrayList<>();
 
 	public void add(O obj)
 	{

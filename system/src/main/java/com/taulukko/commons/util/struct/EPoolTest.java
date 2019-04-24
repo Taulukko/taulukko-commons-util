@@ -8,7 +8,7 @@ public class EPoolTest
 	 */
 	public static void main(String[] args)
 	{
-		EPoolList<Integer> list = new EPoolList<Integer>();
+		EPoolList<Integer> list = new EPoolList<>();
 		list.add(1);
 		list.add(2);
 		list.add(3);

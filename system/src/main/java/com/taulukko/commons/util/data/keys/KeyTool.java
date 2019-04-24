@@ -2,6 +2,7 @@ package com.taulukko.commons.util.data.keys;
 
 import java.math.BigInteger;
 
+import com.taulukko.commons.TaulukkoException;
 import com.taulukko.commons.util.game.EDiceKit;
 import com.taulukko.commons.util.lang.EString;
 
@@ -9,7 +10,7 @@ public class KeyTool {
 	 
 
 	protected static int RADIX_BASE = 36;
- 
+  
 	public static String VERSION = "11"; 
 
 	public static Key stringToKey(String strKey) {
@@ -38,11 +39,11 @@ public class KeyTool {
 	 * @throws Exception 
 	 * */
 
-	public static String build(int iCluster) throws Exception {
+	public static String build(int iCluster) throws TaulukkoException {
 		
 		if(iCluster>=1000 | iCluster<0)
 		{
-			throw new Exception("Cluster must be between 0-999");
+			throw new TaulukkoException("Cluster must be between 0-999");
 		}
 		
 		StringBuilder strKey = new StringBuilder();
@@ -57,8 +58,8 @@ public class KeyTool {
 		EString random = new EString("000000"
 				+ String.valueOf(EDiceKit.rool(1, 1000000, -1)));
 		strKey.append(random.right(6).toString());
-
-		EString nanoTime = new EString("00000000000000000000"
+ 
+		EString nanoTime = new EString("00000000000000000000" 
 				+ String.valueOf(System.nanoTime()));
 		strKey.append(nanoTime.right(21).toString());
 

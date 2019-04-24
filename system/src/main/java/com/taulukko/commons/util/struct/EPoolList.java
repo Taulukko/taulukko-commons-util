@@ -81,7 +81,7 @@ public class EPoolList<V> extends EAbstractList<V> implements IEList<V>
 
 	public void add(V obj)
 	{
-		ENode<V> top = new ENode<V>();
+		ENode<V> top = new ENode<>();
 		//seta a informacao para a fila
 		top.setInfo(obj);
 		//seta o mapeamento
@@ -107,7 +107,7 @@ public class EPoolList<V> extends EAbstractList<V> implements IEList<V>
 
 	public Object clone()
 	{
-		EPoolList<V> ret = new EPoolList<V>();
+		EPoolList<V> ret = new EPoolList<>();
 
 		ENode<V> node = m_baseNode;
 
@@ -124,18 +124,18 @@ public class EPoolList<V> extends EAbstractList<V> implements IEList<V>
 
 	public Enumeration<V> getElements()
 	{
-		return new EVisitorPoolList<V>(this);
+		return new EVisitorPoolList<>(this);
 	}
 
 	public EIterator<V> getItens()
 	{
-		return new EVisitorPoolList<V>(this);
+		return new EVisitorPoolList<>(this);
 	}
 
 	public IEList<V> revert()
 	{
-		EStackList<V> lista = new EStackList<V>();
-		EPoolList<V> ret = new EPoolList<V>();
+		EStackList<V> lista = new EStackList<>();
+		EPoolList<V> ret = new EPoolList<>();
 
 		ENode<V> node = m_baseNode;
 
@@ -172,7 +172,7 @@ public class EPoolList<V> extends EAbstractList<V> implements IEList<V>
 		try
 		{
 
-			EPoolList<V> lista = new EPoolList<V>();
+			EPoolList<V> lista = new EPoolList<>();
 			long lTamanhoOriginal = this.getLength();
 
 			//inverte a pilha 
@@ -215,7 +215,7 @@ public class EPoolList<V> extends EAbstractList<V> implements IEList<V>
 	public EVector<V> toVector()
 	{
 		//cria a variavel de retorno
-		EVector<V> ret = new EVector<V>(this.getLength());
+		EVector<V> ret = new EVector<>(this.getLength());
 
 		//captura o enumerador
 		Enumeration<V> varEnum = this.getElements();

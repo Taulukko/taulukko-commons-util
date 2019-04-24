@@ -113,7 +113,7 @@ public abstract class FacadeBase extends HttpServlet
 			configParameters(request, response);
 
 			int actionSwitch = -1;
-			HashMap<String, Object> parameters = new HashMap<String, Object>();
+			HashMap<String, Object> parameters = new HashMap<>();
 
 			if (ServletFileUpload.isMultipartContent(request))
 			{

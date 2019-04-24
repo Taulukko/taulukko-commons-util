@@ -221,17 +221,19 @@ public final class Base64 {
 	 */
 	public static byte[] decode(String b64, boolean ignoreTerminator)
 			throws IOException {
+		int length = b64.length();
+		
 		if (ignoreTerminator) {
 			if (!b64.endsWith(new String(new char[BASE_64_PAD]))) {
 				b64 = b64 + BASE_64_PAD;
 			}
 		}
 		ByteArrayOutputStream result = new ByteArrayOutputStream(
-				b64.length() / 3);
+				length / 3);
 		int state = 0, i;
 		byte temp = 0;
 
-		for (i = 0; i < b64.length(); i++) {
+		for (i = 0; i <length; i++) {
 			if (Character.isWhitespace(b64.charAt(i))) {
 				continue;
 			}
@@ -274,7 +276,7 @@ public final class Base64 {
 			}
 		}
 
-		if (i < b64.length() && b64.charAt(i) == BASE_64_PAD) {
+		if (i <length  && b64.charAt(i) == BASE_64_PAD) {
 			switch (state) {
 			case 0:
 			case 1:
@@ -295,7 +297,7 @@ public final class Base64 {
 
 			case 3:
 				i++;
-				for (; i < b64.length(); i++) {
+				for (; i < length; i++) {
 					// We should only see whitespace after this.
 					if (!Character.isWhitespace(b64.charAt(i))) {
 						System.err.println(b64.charAt(i));
@@ -305,7 +307,10 @@ public final class Base64 {
 			}
 		} else {
 			if (state != 0) {
-				throw new IOException("malformed Base64 sequence");
+				if(!ignoreTerminator || i < length)
+				{
+					throw new IOException("malformed Base64 sequence");
+				}
 			}
 		}
 
