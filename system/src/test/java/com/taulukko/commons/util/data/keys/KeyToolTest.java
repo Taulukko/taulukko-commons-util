@@ -9,24 +9,25 @@ import org.junit.Test;
 
 import com.taulukko.commons.util.data.keys.Key;
 import com.taulukko.commons.util.data.keys.KeyTool;
+import com.taulukko.commons.util.game.EDiceKit;
+import com.taulukko.commons.util.lang.EString;
 
 public class KeyToolTest {
-
 
 	/**
 	 * Version (formato DD 2) eg 10 para versão 1.0 CLUSTER-ID (formato DDD 3) +
 	 * Thread Id (formato DDD DDD DDD DDD DDD DDD DDD 21) + Random Id (formato
-	 * DDD DDD 6) + nanoSeconds ( formato DDD DDD DDD DDD DDD DDD DDD 21) Total: Dx53
-	 * */
+	 * DDD DDD 6) + nanoSeconds ( formato DDD DDD DDD DDD DDD DDD DDD 21) Total:
+	 * Dx53
+	 */
 
 	@Test
 	public void stringToKeyTest() {
-		String strKey = new BigInteger(
-				"12003000000000000000000004000005000000000000000000006")
+		String strKey = new BigInteger("12003000000000000000000004000005000000000000000000006")
 				.toString(KeyTool.RADIX_BASE);
 
 		Key key = KeyTool.stringToKey(strKey);
-		Assert.assertNotNull(key); 
+		Assert.assertNotNull(key);
 		Assert.assertEquals(6, key.getNanos());
 		Assert.assertEquals(5, key.getRandom());
 		Assert.assertEquals(4, key.getThreadId());
@@ -37,37 +38,37 @@ public class KeyToolTest {
 
 	@Test
 	public void goAndBack() throws Exception {
-		
+
 		long startNanos = System.nanoTime();
-		
+
 		String strKeyBase36 = KeyTool.build(1);
-		
-		String strKeyBigInt = new BigInteger(strKeyBase36,KeyTool.RADIX_BASE).toString();
-		
+
+		String strKeyBigInt = new BigInteger(strKeyBase36, KeyTool.RADIX_BASE).toString();
+
 		System.out.println(strKeyBigInt);
 		System.out.println(strKeyBase36);
 
 		Key key = KeyTool.stringToKey(strKeyBase36);
-		Assert.assertNotNull(key); 
+		Assert.assertNotNull(key);
 		Assert.assertEquals(1, key.getClusterId());
-		Assert.assertEquals(0, key.getMinorVersion());
+		Assert.assertEquals(1, key.getMinorVersion());
 		Assert.assertEquals(1, key.getMajorVersion());
-		
-		long endNanos = System.nanoTime();
-		
-		Assert.assertTrue(key.getNanos() > startNanos);
-		Assert.assertTrue(key.getNanos() < endNanos );
-		 
-	}
 
+		long endNanos = System.nanoTime();
+
+		Assert.assertTrue(key.getNanos() > startNanos);
+		Assert.assertTrue(key.getNanos() < endNanos);
+
+	}
+ 
 	@Test
 	public void testStaticFields() throws Exception {
 		String strUUID = KeyTool.build(1);
-		Assert.assertEquals(34, strUUID.length());
+		Assert.assertTrue(strUUID.length()<35);
 		Key uuid = KeyTool.stringToKey(strUUID);
 		Assert.assertEquals(1, uuid.getClusterId());
 		Assert.assertEquals(1, uuid.getMajorVersion());
-		Assert.assertEquals(0, uuid.getMinorVersion());
+		Assert.assertEquals(1, uuid.getMinorVersion());
 		Assert.assertEquals(Thread.currentThread().getId(), uuid.getThreadId());
 	}
 
@@ -95,8 +96,7 @@ public class KeyToolTest {
 					}
 				}
 
-				Assert.fail("UUID repeat in position " + index1 + " and "
-						+ index2);
+				Assert.fail("UUID repeat in position " + index1 + " and " + index2);
 			} else {
 				listUUID.add(uuid);
 			}
@@ -116,8 +116,8 @@ public class KeyToolTest {
 
 		long totalTime = System.nanoTime() - start;
 		long totalTimePerCreation = totalTime / creationNumber;
-		//0.01 ms or 10k ns
-		Assert.assertTrue( totalTimePerCreation < 10 * 1000  );
+		// 0.01 ms or 10k ns
+		Assert.assertTrue(totalTimePerCreation < 30 * 1000);
 		System.out.println(totalTimePerCreation);
 
 	}
