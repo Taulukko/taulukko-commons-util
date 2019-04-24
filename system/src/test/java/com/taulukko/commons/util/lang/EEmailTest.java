@@ -8,15 +8,13 @@ import org.junit.Test;
 
 import com.taulukko.commons.TaulukkoException;
 
-import org.apache.commons.validator.routines.*;
-
 public class EEmailTest
 {
 
 	@Test
 	public void validateEmail() throws TaulukkoException {
 		 
-		EmailValidator teste;
+		 
 		
 		assertFalse(new EEmail("gand@branco@terra.com.br").isValid());
 		assertFalse(new EEmail("gand.branco.gmail.com.br").isValid());
