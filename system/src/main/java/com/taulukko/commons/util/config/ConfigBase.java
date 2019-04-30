@@ -15,6 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.taulukko.commons.util.io.EFileBufferReader;
 
+@Deprecated
 public abstract class ConfigBase<T extends ConfigBase<T>> implements Map<String, String> {
 
 	private static Map<Class<?>, ConfigBase<?>> instances = new ConcurrentHashMap<>();
